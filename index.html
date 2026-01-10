@@ -33,6 +33,9 @@
             --red: #ff4757;
             --green: #2ed573;
             --gold: #ffd700;
+            --caramel: #d4a574;
+            --caramel-dark: #b8956a;
+            --sugar: #f5e6d3;
         }
 
         body {
@@ -41,6 +44,7 @@
             color: var(--white);
             min-height: 100vh;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         /* Squid Game shapes background */
@@ -122,6 +126,7 @@
             color: var(--pink);
             text-shadow: 0 0 20px var(--pink-glow);
             margin-bottom: 10px;
+            cursor: pointer;
         }
 
         .stats {
@@ -426,6 +431,12 @@
             50% { box-shadow: 0 5px 40px var(--teal-glow); }
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--caramel), var(--caramel-dark));
+            color: var(--darker);
+            box-shadow: 0 5px 20px rgba(212, 165, 116, 0.5);
+        }
+
         /* Screens */
         .screen {
             display: none;
@@ -669,11 +680,344 @@
             color: var(--white);
         }
 
+        /* ==================== DALGONA GAME STYLES ==================== */
+
+        .dalgona-screen {
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        .dalgona-header {
+            margin-bottom: 15px;
+        }
+
+        .dalgona-title {
+            font-size: 1.5rem;
+            color: var(--caramel);
+            text-shadow: 0 0 15px rgba(212, 165, 116, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .dalgona-shape-name {
+            font-size: 1rem;
+            color: var(--teal);
+        }
+
+        .dalgona-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+
+        .dalgona-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dalgona-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .dalgona-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .lives-container {
+            display: flex;
+            gap: 5px;
+        }
+
+        .life {
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .life.lost {
+            opacity: 0.3;
+            transform: scale(0.8);
+            filter: grayscale(1);
+        }
+
+        .life.losing {
+            animation: lifeLost 0.5s ease;
+        }
+
+        @keyframes lifeLost {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5) rotate(15deg); }
+            100% { transform: scale(0.8); opacity: 0.3; }
+        }
+
+        /* Dalgona Canvas Container */
+        .dalgona-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px;
+        }
+
+        #dalgonaCanvas {
+            border-radius: 50%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                        inset 0 -5px 20px rgba(0, 0, 0, 0.3),
+                        0 0 60px rgba(212, 165, 116, 0.3);
+            cursor: none;
+            touch-action: none;
+        }
+
+        /* Needle cursor */
+        .needle-cursor {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            z-index: 1000;
+            transform: translate(-50%, -50%);
+            transition: transform 0.05s ease;
+        }
+
+        .needle-cursor::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 25px;
+            background: linear-gradient(to bottom, #888, #ccc);
+            border-radius: 2px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .needle-cursor::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--pink);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px var(--pink);
+        }
+
+        .needle-cursor.on-path::after {
+            background: var(--green);
+            box-shadow: 0 0 20px var(--green);
+        }
+
+        .needle-cursor.off-path::after {
+            background: var(--red);
+            box-shadow: 0 0 20px var(--red);
+            animation: needleShake 0.1s infinite;
+        }
+
+        @keyframes needleShake {
+            0%, 100% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-48%, -52%); }
+            75% { transform: translate(-52%, -48%); }
+        }
+
+        /* Progress circle around dalgona */
+        .dalgona-progress-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 320px;
+            height: 320px;
+            pointer-events: none;
+        }
+
+        .dalgona-progress-ring circle {
+            fill: none;
+            stroke-width: 4;
+        }
+
+        .dalgona-progress-ring .bg {
+            stroke: var(--gray);
+        }
+
+        .dalgona-progress-ring .progress {
+            stroke: var(--teal);
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            transition: stroke-dashoffset 0.3s ease;
+            filter: drop-shadow(0 0 10px var(--teal));
+        }
+
+        /* Instructions */
+        .dalgona-instructions {
+            font-size: 0.9rem;
+            color: var(--teal);
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--dark);
+            border-radius: 10px;
+            border: 1px solid var(--gray);
+        }
+
+        /* Crack overlay */
+        .crack-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .crack {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.8), transparent);
+            height: 2px;
+            transform-origin: left center;
+            animation: crackAppear 0.3s ease forwards;
+        }
+
+        @keyframes crackAppear {
+            0% { width: 0; opacity: 0; }
+            100% { width: 100%; opacity: 1; }
+        }
+
+        /* Sugar particles */
+        .sugar-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--sugar);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sugarFloat 1s ease forwards;
+        }
+
+        @keyframes sugarFloat {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+        }
+
+        /* Dalgona result overlay */
+        .dalgona-result {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 15, 26, 0.9);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .dalgona-result.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dalgona-result-icon {
+            font-size: 80px;
+            animation: resultBounce 0.6s ease;
+        }
+
+        .dalgona-result-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Shape selection grid */
+        .shape-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 320px;
+        }
+
+        .shape-btn {
+            aspect-ratio: 1;
+            background: var(--dark);
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 5px;
+        }
+
+        .shape-btn:hover {
+            border-color: var(--caramel);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.3);
+        }
+
+        .shape-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .shape-btn.completed {
+            border-color: var(--green);
+            background: rgba(46, 213, 115, 0.1);
+        }
+
+        .shape-btn-icon {
+            font-size: 1.5rem;
+        }
+
+        .shape-btn-name {
+            font-size: 0.6rem;
+            color: var(--teal);
+        }
+
+        .shape-btn-difficulty {
+            font-size: 0.5rem;
+            color: var(--caramel);
+        }
+
+        /* Bonus unlock message */
+        .bonus-unlock {
+            background: linear-gradient(135deg, var(--gold), #ffaa00);
+            color: var(--darker);
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            animation: bonusPulse 1s infinite;
+            font-weight: bold;
+        }
+
+        @keyframes bonusPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        }
+
         /* Responsive */
         @media (max-width: 400px) {
             .problem { font-size: 2rem; }
             .step input { width: 45px; height: 35px; font-size: 1rem; }
             .answer-input { width: 80px; height: 50px; font-size: 1.5rem; }
+            .dalgona-container { width: 260px; height: 260px; }
+            #dalgonaCanvas { width: 260px; height: 260px; }
+            .dalgona-progress-ring { width: 280px; height: 280px; }
+            .shape-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -688,10 +1032,13 @@
         <div class="shape square"></div>
     </div>
 
+    <!-- Needle cursor for Dalgona -->
+    <div class="needle-cursor" id="needleCursor" style="display: none;"></div>
+
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">SQUID MATH</div>
+            <div class="logo" onclick="showStart()">SQUID MATH</div>
             <div class="stats">
                 <span>Сесій: <strong id="sessionsToday">0</strong></span>
                 <span>Правильно: <strong id="todayTotal">0</strong></span>
@@ -723,7 +1070,10 @@
             </div>
 
             <button class="btn btn-primary" onclick="startGame()">
-                Почати гру
+                🎮 Математика
+            </button>
+            <button class="btn btn-secondary" style="margin-top: 15px;" onclick="showDalgonaMenu()">
+                🍪 Dalgona Гра
             </button>
         </div>
 
@@ -769,11 +1119,79 @@
             <div class="result-stats" id="resultStats">
                 Правильно: 8 з 10
             </div>
+
+            <div class="bonus-unlock" id="bonusUnlock" style="display: none;">
+                🎉 Бонус розблоковано: Dalgona!
+            </div>
+
             <button class="btn btn-success" onclick="startGame()">
                 Грати ще раз
             </button>
+            <button class="btn btn-secondary" id="playDalgonaBtn" style="margin-top: 15px; display: none;" onclick="startRandomDalgona()">
+                🍪 Грати в Dalgona
+            </button>
             <button class="btn btn-next" style="margin-top: 15px; animation: none;" onclick="showStart()">
                 На головну
+            </button>
+        </div>
+
+        <!-- Dalgona Menu Screen -->
+        <div class="screen dalgona-screen" id="dalgonaMenuScreen">
+            <h2 class="dalgona-title">🍪 Dalgona Challenge</h2>
+            <p class="subtitle">Обери фігуру для вирізання</p>
+
+            <div class="shape-grid" id="shapeGrid"></div>
+
+            <button class="btn btn-next" style="animation: none;" onclick="showStart()">
+                ← Назад
+            </button>
+        </div>
+
+        <!-- Dalgona Game Screen -->
+        <div class="screen dalgona-screen" id="dalgonaGameScreen">
+            <div class="dalgona-header">
+                <h2 class="dalgona-title">🍪 Dalgona</h2>
+                <p class="dalgona-shape-name" id="dalgonaShapeName">Коло</p>
+            </div>
+
+            <div class="dalgona-stats">
+                <div class="dalgona-stat">
+                    <span class="dalgona-stat-label">Прогрес</span>
+                    <span class="dalgona-stat-value" id="dalgonaProgress">0%</span>
+                </div>
+                <div class="dalgona-stat">
+                    <span class="dalgona-stat-label">Життя</span>
+                    <div class="lives-container" id="livesContainer">
+                        <span class="life">💖</span>
+                        <span class="life">💖</span>
+                        <span class="life">💖</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dalgona-container" id="dalgonaContainer">
+                <svg class="dalgona-progress-ring" viewBox="0 0 320 320">
+                    <circle class="bg" cx="160" cy="160" r="155"></circle>
+                    <circle class="progress" id="dalgonaRing" cx="160" cy="160" r="155"
+                            stroke-dasharray="974" stroke-dashoffset="974"></circle>
+                </svg>
+                <canvas id="dalgonaCanvas" width="300" height="300"></canvas>
+                <div class="crack-overlay" id="crackOverlay"></div>
+                <div class="dalgona-result" id="dalgonaResult">
+                    <div class="dalgona-result-icon" id="dalgonaResultIcon">🎉</div>
+                    <div class="dalgona-result-text" id="dalgonaResultText">Успіх!</div>
+                </div>
+            </div>
+
+            <p class="dalgona-instructions" id="dalgonaInstructions">
+                👆 Проведи пальцем по контуру фігури, не виходячи за лінію!
+            </p>
+
+            <button class="btn btn-primary" id="dalgonaActionBtn" onclick="restartDalgona()">
+                🔄 Спробувати ще
+            </button>
+            <button class="btn btn-next" style="margin-top: 15px; animation: none;" onclick="showDalgonaMenu()">
+                ← До вибору фігур
             </button>
         </div>
     </div>
@@ -791,7 +1209,7 @@
     </div>
 
     <script>
-        // Game state
+        // ==================== MATH GAME STATE ====================
         let currentProblem = 0;
         let totalProblems = 10;
         let correctAnswers = 0;
@@ -802,8 +1220,9 @@
 
         // Storage keys
         const STORAGE_KEY = 'squidMathStats';
+        const DALGONA_KEY = 'dalgonaStats';
 
-        // Confetti setup
+        // ==================== CONFETTI ====================
         const canvas = document.getElementById('confettiCanvas');
         const ctx = canvas.getContext('2d');
         let confettiParticles = [];
@@ -832,7 +1251,7 @@
                 this.y += this.speedY;
                 this.x += this.speedX;
                 this.rotation += this.rotationSpeed;
-                this.speedY += 0.1; // gravity
+                this.speedY += 0.1;
             }
 
             draw() {
@@ -858,41 +1277,36 @@
                     confettiParticles.push(new ConfettiParticle());
                 }, i * 20);
             }
+            animateConfetti();
         }
 
         function animateConfetti() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             confettiParticles = confettiParticles.filter(p => p.y < canvas.height + 20);
-
             confettiParticles.forEach(p => {
                 p.update();
                 p.draw();
             });
-
             if (confettiParticles.length > 0) {
                 requestAnimationFrame(animateConfetti);
             }
         }
 
-        // Floating +1 score
-        function showFloatingScore(x, y) {
+        function showFloatingScore(x, y, text = '+1') {
             const el = document.createElement('div');
             el.className = 'float-score';
-            el.textContent = '+1';
+            el.textContent = text;
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             document.body.appendChild(el);
-
             setTimeout(() => el.remove(), 1000);
         }
 
-        // Get today's date string
+        // ==================== STATS ====================
         function getTodayKey() {
             return new Date().toISOString().split('T')[0];
         }
 
-        // Load stats from localStorage
         function loadStats() {
             const data = localStorage.getItem(STORAGE_KEY);
             if (data) {
@@ -905,12 +1319,10 @@
             return { date: getTodayKey(), sessions: 0, correct: 0, best: 0 };
         }
 
-        // Save stats to localStorage
         function saveStats(stats) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
         }
 
-        // Update UI with stats
         function updateStatsUI() {
             const stats = loadStats();
             document.getElementById('sessionsToday').textContent = stats.sessions;
@@ -919,11 +1331,9 @@
             document.getElementById('todayCorrect').textContent = stats.correct;
         }
 
-        // Update streak display
         function updateStreak() {
             const streakEl = document.getElementById('streakCounter');
             const streakNum = document.getElementById('streakNum');
-
             if (streak >= 2) {
                 streakNum.textContent = streak;
                 streakEl.classList.add('visible');
@@ -932,7 +1342,23 @@
             }
         }
 
-        // Generate a random problem
+        // ==================== SCREEN MANAGEMENT ====================
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+
+            // Hide needle cursor when not in dalgona game
+            if (screenId !== 'dalgonaGameScreen') {
+                document.getElementById('needleCursor').style.display = 'none';
+            }
+        }
+
+        function showStart() {
+            updateStatsUI();
+            showScreen('startScreen');
+        }
+
+        // ==================== MATH GAME ====================
         function generateProblem() {
             const types = [
                 { ops: ['+', '+'] },
@@ -966,7 +1392,6 @@
             };
         }
 
-        // Generate all problems
         function generateProblems() {
             problems = [];
             for (let i = 0; i < totalProblems; i++) {
@@ -974,19 +1399,6 @@
             }
         }
 
-        // Show screen
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        // Show start screen
-        function showStart() {
-            updateStatsUI();
-            showScreen('startScreen');
-        }
-
-        // Start game
         function startGame() {
             currentProblem = 0;
             correctAnswers = 0;
@@ -998,7 +1410,6 @@
             showScreen('gameScreen');
         }
 
-        // Show current problem
         function showProblem() {
             const problem = problems[currentProblem];
             document.getElementById('problemDisplay').textContent = problem.display;
@@ -1013,14 +1424,12 @@
             updateProgress();
         }
 
-        // Update progress bar
         function updateProgress() {
             const progress = ((currentProblem + 1) / totalProblems) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             document.getElementById('progressText').textContent = `${currentProblem + 1}/${totalProblems}`;
         }
 
-        // Add a step
         function addStep() {
             stepCount++;
             const container = document.getElementById('stepsContainer');
@@ -1042,13 +1451,11 @@
             container.appendChild(stepDiv);
         }
 
-        // Remove a step
         function removeStep(id) {
             const step = document.getElementById(`step-${id}`);
             if (step) step.remove();
         }
 
-        // Validate all steps
         function validateSteps() {
             const steps = document.querySelectorAll('.step');
             let allValid = true;
@@ -1068,12 +1475,7 @@
                     return;
                 }
 
-                let expected;
-                if (operator === '+') {
-                    expected = num1 + num2;
-                } else {
-                    expected = num1 - num2;
-                }
+                let expected = operator === '+' ? num1 + num2 : num1 - num2;
 
                 if (expected === result && !isNaN(expected)) {
                     status.textContent = '✓';
@@ -1092,16 +1494,13 @@
             return allValid;
         }
 
-        // Check answer
         function checkAnswer() {
             const problem = problems[currentProblem];
             const userAnswer = parseInt(document.getElementById('answerInput').value);
             const answerInput = document.getElementById('answerInput');
-
             const stepsValid = validateSteps();
 
             if (userAnswer === problem.answer && stepsValid) {
-                // Correct!
                 correctAnswers++;
                 streak++;
                 updateStreak();
@@ -1110,14 +1509,11 @@
                 document.getElementById('problemCard').classList.add('correct-flash');
                 showFeedback('✓', 'var(--green)');
 
-                // Show floating +1
                 const rect = answerInput.getBoundingClientRect();
                 showFloatingScore(rect.left + rect.width/2, rect.top);
 
-                // Launch confetti for streaks
                 if (streak >= 3) {
                     launchConfetti(streak * 10);
-                    animateConfetti();
                 }
 
                 const btn = document.getElementById('checkBtn');
@@ -1125,36 +1521,25 @@
                 btn.className = 'btn btn-next';
                 btn.onclick = nextProblem;
             } else {
-                // Wrong
                 streak = 0;
                 updateStreak();
-
                 answerInput.classList.add('wrong');
                 answerInput.classList.add('shake');
                 showFeedback('✗', 'var(--red)');
-
-                setTimeout(() => {
-                    answerInput.classList.remove('shake');
-                }, 400);
+                setTimeout(() => answerInput.classList.remove('shake'), 400);
             }
         }
 
-        // Show feedback animation
         function showFeedback(text, color) {
             const feedback = document.getElementById('feedback');
             feedback.textContent = text;
             feedback.style.color = color;
             feedback.style.display = 'block';
-
-            setTimeout(() => {
-                feedback.style.display = 'none';
-            }, 500);
+            setTimeout(() => feedback.style.display = 'none', 500);
         }
 
-        // Go to next problem
         function nextProblem() {
             currentProblem++;
-
             if (currentProblem >= totalProblems) {
                 endGame();
             } else {
@@ -1162,17 +1547,13 @@
             }
         }
 
-        // End game
         function endGame() {
             const stats = loadStats();
             stats.sessions++;
             stats.correct += correctAnswers;
-            if (correctAnswers > stats.best) {
-                stats.best = correctAnswers;
-            }
+            if (correctAnswers > stats.best) stats.best = correctAnswers;
             saveStats(stats);
 
-            // Stars based on score
             let stars = '';
             if (correctAnswers >= 10) stars = '⭐⭐⭐';
             else if (correctAnswers >= 8) stars = '⭐⭐';
@@ -1187,13 +1568,18 @@
             document.getElementById('resultTitle').textContent = title;
             document.getElementById('resultStats').textContent = `Правильно: ${correctAnswers} з ${totalProblems}`;
 
+            // Show dalgona bonus if score >= 8
+            if (correctAnswers >= 8) {
+                document.getElementById('bonusUnlock').style.display = 'block';
+                document.getElementById('playDalgonaBtn').style.display = 'block';
+                launchConfetti(correctAnswers >= 10 ? 100 : 50);
+            } else {
+                document.getElementById('bonusUnlock').style.display = 'none';
+                document.getElementById('playDalgonaBtn').style.display = 'none';
+            }
+
             if (correctAnswers >= 10) {
                 document.getElementById('resultTitle').classList.add('perfect-score');
-                launchConfetti(100);
-                animateConfetti();
-            } else if (correctAnswers >= 8) {
-                launchConfetti(50);
-                animateConfetti();
             } else {
                 document.getElementById('resultTitle').classList.remove('perfect-score');
             }
@@ -1201,12 +1587,745 @@
             showScreen('resultScreen');
         }
 
-        // PWA Install
+        // ==================== DALGONA GAME ====================
+
+        // Shape definitions with paths
+        const dalgonaShapes = [
+            {
+                id: 'circle',
+                name: 'Коло',
+                icon: '⭕',
+                difficulty: 1,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    for (let i = 0; i <= 360; i += 5) {
+                        const rad = i * Math.PI / 180;
+                        points.push({ x: cx + Math.cos(rad) * r, y: cy + Math.sin(rad) * r });
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'triangle',
+                name: 'Трикутник',
+                icon: '△',
+                difficulty: 1,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const vertices = [
+                        { x: cx, y: cy - r },
+                        { x: cx + r * 0.866, y: cy + r * 0.5 },
+                        { x: cx - r * 0.866, y: cy + r * 0.5 }
+                    ];
+                    for (let i = 0; i < 3; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % 3];
+                        for (let t = 0; t <= 1; t += 0.05) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'square',
+                name: 'Квадрат',
+                icon: '⬜',
+                difficulty: 1,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const half = r * 0.7;
+                    const vertices = [
+                        { x: cx - half, y: cy - half },
+                        { x: cx + half, y: cy - half },
+                        { x: cx + half, y: cy + half },
+                        { x: cx - half, y: cy + half }
+                    ];
+                    for (let i = 0; i < 4; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % 4];
+                        for (let t = 0; t <= 1; t += 0.05) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'diamond',
+                name: 'Ромб',
+                icon: '◇',
+                difficulty: 2,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const vertices = [
+                        { x: cx, y: cy - r },
+                        { x: cx + r * 0.6, y: cy },
+                        { x: cx, y: cy + r },
+                        { x: cx - r * 0.6, y: cy }
+                    ];
+                    for (let i = 0; i < 4; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % 4];
+                        for (let t = 0; t <= 1; t += 0.05) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'star5',
+                name: 'Зірка',
+                icon: '⭐',
+                difficulty: 2,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const outerR = r;
+                    const innerR = r * 0.4;
+                    const vertices = [];
+                    for (let i = 0; i < 10; i++) {
+                        const angle = (i * 36 - 90) * Math.PI / 180;
+                        const radius = i % 2 === 0 ? outerR : innerR;
+                        vertices.push({ x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius });
+                    }
+                    for (let i = 0; i < 10; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % 10];
+                        for (let t = 0; t <= 1; t += 0.1) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'heart',
+                name: 'Серце',
+                icon: '❤️',
+                difficulty: 2,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    for (let t = 0; t <= 2 * Math.PI; t += 0.1) {
+                        const x = 16 * Math.pow(Math.sin(t), 3);
+                        const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                        points.push({ x: cx + x * r / 18, y: cy + y * r / 18 });
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'hexagon',
+                name: 'Шестикутник',
+                icon: '⬡',
+                difficulty: 2,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const vertices = [];
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i * 60 - 90) * Math.PI / 180;
+                        vertices.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r });
+                    }
+                    for (let i = 0; i < 6; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % 6];
+                        for (let t = 0; t <= 1; t += 0.08) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'moon',
+                name: 'Місяць',
+                icon: '🌙',
+                difficulty: 3,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    // Outer arc
+                    for (let i = -90; i <= 90; i += 5) {
+                        const rad = i * Math.PI / 180;
+                        points.push({ x: cx + Math.cos(rad) * r, y: cy + Math.sin(rad) * r });
+                    }
+                    // Inner arc (concave)
+                    for (let i = 90; i >= -90; i -= 5) {
+                        const rad = i * Math.PI / 180;
+                        points.push({ x: cx + r * 0.3 + Math.cos(rad) * r * 0.7, y: cy + Math.sin(rad) * r * 0.7 });
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'tree',
+                name: 'Ялинка',
+                icon: '🎄',
+                difficulty: 3,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const vertices = [
+                        { x: cx, y: cy - r },           // top
+                        { x: cx + r * 0.3, y: cy - r * 0.4 },
+                        { x: cx + r * 0.15, y: cy - r * 0.4 },
+                        { x: cx + r * 0.5, y: cy + r * 0.1 },
+                        { x: cx + r * 0.25, y: cy + r * 0.1 },
+                        { x: cx + r * 0.7, y: cy + r * 0.6 },
+                        { x: cx + r * 0.15, y: cy + r * 0.6 },
+                        { x: cx + r * 0.15, y: cy + r },  // trunk
+                        { x: cx - r * 0.15, y: cy + r },
+                        { x: cx - r * 0.15, y: cy + r * 0.6 },
+                        { x: cx - r * 0.7, y: cy + r * 0.6 },
+                        { x: cx - r * 0.25, y: cy + r * 0.1 },
+                        { x: cx - r * 0.5, y: cy + r * 0.1 },
+                        { x: cx - r * 0.15, y: cy - r * 0.4 },
+                        { x: cx - r * 0.3, y: cy - r * 0.4 }
+                    ];
+                    for (let i = 0; i < vertices.length; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % vertices.length];
+                        for (let t = 0; t <= 1; t += 0.1) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'umbrella',
+                name: 'Парасолька',
+                icon: '☂️',
+                difficulty: 3,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    // Top arc
+                    for (let i = 180; i <= 360; i += 5) {
+                        const rad = i * Math.PI / 180;
+                        points.push({ x: cx + Math.cos(rad) * r, y: cy - r * 0.2 + Math.sin(rad) * r * 0.6 });
+                    }
+                    // Scalloped edge
+                    const scallops = 5;
+                    for (let s = 0; s < scallops; s++) {
+                        const startX = cx - r + (2 * r / scallops) * s;
+                        const endX = startX + (2 * r / scallops);
+                        for (let t = 0; t <= 1; t += 0.1) {
+                            const x = startX + (endX - startX) * t;
+                            const y = cy - r * 0.2 + Math.sin(t * Math.PI) * r * 0.15;
+                            points.push({ x, y });
+                        }
+                    }
+                    // Handle
+                    points.push({ x: cx, y: cy - r * 0.2 });
+                    points.push({ x: cx, y: cy + r * 0.7 });
+                    // Hook
+                    for (let i = 0; i <= 180; i += 10) {
+                        const rad = i * Math.PI / 180;
+                        points.push({ x: cx - r * 0.15 + Math.cos(rad) * r * 0.15, y: cy + r * 0.7 + Math.sin(rad) * r * 0.15 });
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'cross',
+                name: 'Хрест',
+                icon: '✚',
+                difficulty: 2,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const w = r * 0.3;
+                    const vertices = [
+                        { x: cx - w, y: cy - r },
+                        { x: cx + w, y: cy - r },
+                        { x: cx + w, y: cy - w },
+                        { x: cx + r, y: cy - w },
+                        { x: cx + r, y: cy + w },
+                        { x: cx + w, y: cy + w },
+                        { x: cx + w, y: cy + r },
+                        { x: cx - w, y: cy + r },
+                        { x: cx - w, y: cy + w },
+                        { x: cx - r, y: cy + w },
+                        { x: cx - r, y: cy - w },
+                        { x: cx - w, y: cy - w }
+                    ];
+                    for (let i = 0; i < vertices.length; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % vertices.length];
+                        for (let t = 0; t <= 1; t += 0.1) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            },
+            {
+                id: 'house',
+                name: 'Будинок',
+                icon: '🏠',
+                difficulty: 3,
+                getPath: (cx, cy, r) => {
+                    const points = [];
+                    const vertices = [
+                        { x: cx, y: cy - r },           // roof top
+                        { x: cx + r * 0.8, y: cy - r * 0.2 },  // roof right
+                        { x: cx + r * 0.8, y: cy + r },  // bottom right
+                        { x: cx + r * 0.2, y: cy + r },  // door right
+                        { x: cx + r * 0.2, y: cy + r * 0.3 },  // door top right
+                        { x: cx - r * 0.2, y: cy + r * 0.3 },  // door top left
+                        { x: cx - r * 0.2, y: cy + r },  // door left
+                        { x: cx - r * 0.8, y: cy + r },  // bottom left
+                        { x: cx - r * 0.8, y: cy - r * 0.2 },  // roof left
+                    ];
+                    for (let i = 0; i < vertices.length; i++) {
+                        const start = vertices[i];
+                        const end = vertices[(i + 1) % vertices.length];
+                        for (let t = 0; t <= 1; t += 0.1) {
+                            points.push({
+                                x: start.x + (end.x - start.x) * t,
+                                y: start.y + (end.y - start.y) * t
+                            });
+                        }
+                    }
+                    return points;
+                }
+            }
+        ];
+
+        // Dalgona game state
+        let dalgonaState = {
+            shape: null,
+            path: [],
+            traced: [],
+            lives: 3,
+            progress: 0,
+            isDrawing: false,
+            currentIndex: 0,
+            completed: false,
+            failed: false,
+            tolerance: 20
+        };
+
+        const dalgonaCanvas = document.getElementById('dalgonaCanvas');
+        const dalgonaCtx = dalgonaCanvas.getContext('2d');
+
+        // Load dalgona stats
+        function loadDalgonaStats() {
+            const data = localStorage.getItem(DALGONA_KEY);
+            return data ? JSON.parse(data) : { completed: [] };
+        }
+
+        function saveDalgonaStats(stats) {
+            localStorage.setItem(DALGONA_KEY, JSON.stringify(stats));
+        }
+
+        // Show dalgona menu
+        function showDalgonaMenu() {
+            const grid = document.getElementById('shapeGrid');
+            const stats = loadDalgonaStats();
+
+            grid.innerHTML = dalgonaShapes.map(shape => {
+                const isCompleted = stats.completed.includes(shape.id);
+                return `
+                    <div class="shape-btn ${isCompleted ? 'completed' : ''}" onclick="startDalgona('${shape.id}')">
+                        <span class="shape-btn-icon">${shape.icon}</span>
+                        <span class="shape-btn-name">${shape.name}</span>
+                        <span class="shape-btn-difficulty">${'⭐'.repeat(shape.difficulty)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            showScreen('dalgonaMenuScreen');
+        }
+
+        // Start dalgona game
+        function startDalgona(shapeId) {
+            const shape = dalgonaShapes.find(s => s.id === shapeId);
+            if (!shape) return;
+
+            const canvasSize = dalgonaCanvas.width;
+            const cx = canvasSize / 2;
+            const cy = canvasSize / 2;
+            const r = canvasSize * 0.35;
+
+            dalgonaState = {
+                shape: shape,
+                path: shape.getPath(cx, cy, r),
+                traced: [],
+                lives: 3,
+                progress: 0,
+                isDrawing: false,
+                currentIndex: 0,
+                completed: false,
+                failed: false,
+                tolerance: 25 - shape.difficulty * 3
+            };
+
+            document.getElementById('dalgonaShapeName').textContent = shape.name;
+            document.getElementById('dalgonaProgress').textContent = '0%';
+            document.getElementById('dalgonaInstructions').textContent = '👆 Проведи пальцем по контуру фігури!';
+            document.getElementById('dalgonaResult').classList.remove('show');
+            document.getElementById('crackOverlay').innerHTML = '';
+
+            updateLivesDisplay();
+            updateProgressRing(0);
+            drawDalgona();
+
+            showScreen('dalgonaGameScreen');
+
+            // Show needle cursor
+            document.getElementById('needleCursor').style.display = 'block';
+        }
+
+        // Start random dalgona (from result screen)
+        function startRandomDalgona() {
+            const easyShapes = dalgonaShapes.filter(s => s.difficulty <= 2);
+            const randomShape = easyShapes[Math.floor(Math.random() * easyShapes.length)];
+            startDalgona(randomShape.id);
+        }
+
+        // Draw dalgona cookie
+        function drawDalgona() {
+            const ctx = dalgonaCtx;
+            const size = dalgonaCanvas.width;
+            const cx = size / 2;
+            const cy = size / 2;
+
+            ctx.clearRect(0, 0, size, size);
+
+            // Cookie background
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, size/2);
+            gradient.addColorStop(0, '#e8c896');
+            gradient.addColorStop(0.7, '#d4a574');
+            gradient.addColorStop(1, '#b8956a');
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, size/2 - 5, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Cookie texture
+            ctx.globalAlpha = 0.1;
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+                if (dist < size/2 - 10) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, Math.random() * 3 + 1, 0, Math.PI * 2);
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fill();
+                }
+            }
+            ctx.globalAlpha = 1;
+
+            // Draw shape outline
+            if (dalgonaState.path.length > 0) {
+                ctx.beginPath();
+                ctx.moveTo(dalgonaState.path[0].x, dalgonaState.path[0].y);
+                for (let i = 1; i < dalgonaState.path.length; i++) {
+                    ctx.lineTo(dalgonaState.path[i].x, dalgonaState.path[i].y);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = '#5c4033';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Draw traced path
+                if (dalgonaState.traced.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(dalgonaState.traced[0].x, dalgonaState.traced[0].y);
+                    for (let i = 1; i < dalgonaState.traced.length; i++) {
+                        ctx.lineTo(dalgonaState.traced[i].x, dalgonaState.traced[i].y);
+                    }
+                    ctx.strokeStyle = '#00F5D4';
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.shadowColor = '#00F5D4';
+                    ctx.shadowBlur = 10;
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+
+                // Draw start point indicator
+                if (!dalgonaState.isDrawing && dalgonaState.progress < 5) {
+                    const startPoint = dalgonaState.path[0];
+                    ctx.beginPath();
+                    ctx.arc(startPoint.x, startPoint.y, 15, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0, 245, 212, 0.3)';
+                    ctx.fill();
+                    ctx.strokeStyle = '#00F5D4';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Pulsing animation
+                    const pulseSize = 15 + Math.sin(Date.now() / 200) * 5;
+                    ctx.beginPath();
+                    ctx.arc(startPoint.x, startPoint.y, pulseSize, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(0, 245, 212, 0.5)';
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Update lives display
+        function updateLivesDisplay() {
+            const container = document.getElementById('livesContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const life = document.createElement('span');
+                life.className = 'life' + (i >= dalgonaState.lives ? ' lost' : '');
+                life.textContent = '💖';
+                container.appendChild(life);
+            }
+        }
+
+        // Update progress ring
+        function updateProgressRing(progress) {
+            const ring = document.getElementById('dalgonaRing');
+            const circumference = 2 * Math.PI * 155;
+            const offset = circumference - (progress / 100) * circumference;
+            ring.style.strokeDashoffset = offset;
+        }
+
+        // Add crack effect
+        function addCrack(x, y) {
+            const overlay = document.getElementById('crackOverlay');
+            const crack = document.createElement('div');
+            crack.className = 'crack';
+            crack.style.left = (x / dalgonaCanvas.width * 100) + '%';
+            crack.style.top = (y / dalgonaCanvas.height * 100) + '%';
+            crack.style.transform = `rotate(${Math.random() * 360}deg)`;
+            crack.style.width = (30 + Math.random() * 40) + 'px';
+            overlay.appendChild(crack);
+
+            // Vibrate on mobile
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Add sugar particles
+        function addSugarParticles(x, y) {
+            const container = document.getElementById('dalgonaContainer');
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'sugar-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.setProperty('--tx', (Math.random() * 40 - 20) + 'px');
+                particle.style.setProperty('--ty', (Math.random() * 40 - 20) + 'px');
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // Check if point is on path
+        function isOnPath(x, y) {
+            const tolerance = dalgonaState.tolerance;
+            let minDist = Infinity;
+            let closestIndex = dalgonaState.currentIndex;
+
+            // Check points ahead of current position
+            const checkRange = Math.min(dalgonaState.path.length, dalgonaState.currentIndex + 30);
+            for (let i = dalgonaState.currentIndex; i < checkRange; i++) {
+                const point = dalgonaState.path[i];
+                const dist = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestIndex = i;
+                }
+            }
+
+            return {
+                onPath: minDist <= tolerance,
+                distance: minDist,
+                index: closestIndex
+            };
+        }
+
+        // Handle drawing
+        function handleDalgonaStart(e) {
+            if (dalgonaState.completed || dalgonaState.failed) return;
+
+            const rect = dalgonaCanvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+            // Scale coordinates
+            const scaleX = dalgonaCanvas.width / rect.width;
+            const scaleY = dalgonaCanvas.height / rect.height;
+            const canvasX = x * scaleX;
+            const canvasY = y * scaleY;
+
+            // Check if near start point
+            const startPoint = dalgonaState.path[dalgonaState.currentIndex];
+            const distToStart = Math.sqrt((canvasX - startPoint.x) ** 2 + (canvasY - startPoint.y) ** 2);
+
+            if (distToStart <= dalgonaState.tolerance * 1.5) {
+                dalgonaState.isDrawing = true;
+                dalgonaState.traced.push({ x: canvasX, y: canvasY });
+                document.getElementById('dalgonaInstructions').textContent = '✨ Продовжуй по контуру!';
+            }
+        }
+
+        function handleDalgonaMove(e) {
+            e.preventDefault();
+
+            const rect = dalgonaCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // Update needle cursor
+            const needle = document.getElementById('needleCursor');
+            needle.style.left = clientX + 'px';
+            needle.style.top = clientY + 'px';
+
+            if (!dalgonaState.isDrawing || dalgonaState.completed || dalgonaState.failed) return;
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const scaleX = dalgonaCanvas.width / rect.width;
+            const scaleY = dalgonaCanvas.height / rect.height;
+            const canvasX = x * scaleX;
+            const canvasY = y * scaleY;
+
+            const check = isOnPath(canvasX, canvasY);
+
+            if (check.onPath) {
+                needle.classList.add('on-path');
+                needle.classList.remove('off-path');
+
+                dalgonaState.traced.push({ x: canvasX, y: canvasY });
+                dalgonaState.currentIndex = Math.max(dalgonaState.currentIndex, check.index);
+
+                // Update progress
+                dalgonaState.progress = Math.floor((dalgonaState.currentIndex / dalgonaState.path.length) * 100);
+                document.getElementById('dalgonaProgress').textContent = dalgonaState.progress + '%';
+                updateProgressRing(dalgonaState.progress);
+
+                // Add sugar particles
+                const containerRect = document.getElementById('dalgonaContainer').getBoundingClientRect();
+                addSugarParticles(clientX - containerRect.left, clientY - containerRect.top);
+
+                // Check if completed
+                if (dalgonaState.currentIndex >= dalgonaState.path.length - 5) {
+                    dalgonaSuccess();
+                }
+            } else {
+                needle.classList.remove('on-path');
+                needle.classList.add('off-path');
+
+                // Lose a life
+                dalgonaState.lives--;
+                updateLivesDisplay();
+                addCrack(canvasX, canvasY);
+
+                // Animate life loss
+                const lives = document.querySelectorAll('.life');
+                if (lives[dalgonaState.lives]) {
+                    lives[dalgonaState.lives].classList.add('losing');
+                }
+
+                if (dalgonaState.lives <= 0) {
+                    dalgonaFail();
+                }
+            }
+
+            drawDalgona();
+        }
+
+        function handleDalgonaEnd() {
+            dalgonaState.isDrawing = false;
+            document.getElementById('needleCursor').classList.remove('on-path', 'off-path');
+        }
+
+        // Dalgona success
+        function dalgonaSuccess() {
+            dalgonaState.completed = true;
+            dalgonaState.isDrawing = false;
+
+            const stats = loadDalgonaStats();
+            if (!stats.completed.includes(dalgonaState.shape.id)) {
+                stats.completed.push(dalgonaState.shape.id);
+                saveDalgonaStats(stats);
+            }
+
+            document.getElementById('dalgonaResultIcon').textContent = '🎉';
+            document.getElementById('dalgonaResultText').textContent = 'Успіх!';
+            document.getElementById('dalgonaResultText').style.color = 'var(--green)';
+            document.getElementById('dalgonaResult').classList.add('show');
+            document.getElementById('dalgonaInstructions').textContent = '🏆 Чудова робота!';
+
+            launchConfetti(80);
+        }
+
+        // Dalgona fail
+        function dalgonaFail() {
+            dalgonaState.failed = true;
+            dalgonaState.isDrawing = false;
+
+            document.getElementById('dalgonaResultIcon').textContent = '💔';
+            document.getElementById('dalgonaResultText').textContent = 'Зламалось!';
+            document.getElementById('dalgonaResultText').style.color = 'var(--red)';
+            document.getElementById('dalgonaResult').classList.add('show');
+            document.getElementById('dalgonaInstructions').textContent = '😢 Спробуй ще раз!';
+
+            // Crack animation on canvas
+            dalgonaCtx.fillStyle = 'rgba(139, 69, 19, 0.3)';
+            dalgonaCtx.fillRect(0, 0, dalgonaCanvas.width, dalgonaCanvas.height);
+        }
+
+        // Restart dalgona
+        function restartDalgona() {
+            if (dalgonaState.shape) {
+                startDalgona(dalgonaState.shape.id);
+            }
+        }
+
+        // Event listeners for dalgona
+        dalgonaCanvas.addEventListener('mousedown', handleDalgonaStart);
+        dalgonaCanvas.addEventListener('mousemove', handleDalgonaMove);
+        dalgonaCanvas.addEventListener('mouseup', handleDalgonaEnd);
+        dalgonaCanvas.addEventListener('mouseleave', handleDalgonaEnd);
+
+        dalgonaCanvas.addEventListener('touchstart', handleDalgonaStart, { passive: false });
+        dalgonaCanvas.addEventListener('touchmove', handleDalgonaMove, { passive: false });
+        dalgonaCanvas.addEventListener('touchend', handleDalgonaEnd);
+
+        // Track cursor globally for needle effect
+        document.addEventListener('mousemove', (e) => {
+            const needle = document.getElementById('needleCursor');
+            if (needle.style.display !== 'none') {
+                needle.style.left = e.clientX + 'px';
+                needle.style.top = e.clientY + 'px';
+            }
+        });
+
+        // ==================== PWA ====================
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-
-            // Show install prompt after first game
             const stats = loadStats();
             if (stats.sessions >= 1) {
                 document.getElementById('installPrompt').classList.add('show');
@@ -1216,7 +2335,7 @@
         function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((result) => {
+                deferredPrompt.userChoice.then(() => {
                     deferredPrompt = null;
                     document.getElementById('installPrompt').classList.remove('show');
                 });
@@ -1227,7 +2346,6 @@
             document.getElementById('installPrompt').classList.remove('show');
         }
 
-        // Register Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
