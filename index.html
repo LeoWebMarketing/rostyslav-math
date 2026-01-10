@@ -1072,7 +1072,7 @@
             <button class="btn btn-primary" onclick="startGame()">
                 🎮 Математика
             </button>
-            <button class="btn btn-secondary" style="margin-top: 15px;" onclick="showDalgonaMenu()">
+            <button class="btn btn-secondary" style="margin-top: 15px;" onclick="startRandomDalgona()">
                 🍪 Dalgona Гра
             </button>
         </div>
@@ -1190,8 +1190,11 @@
             <button class="btn btn-primary" id="dalgonaActionBtn" onclick="restartDalgona()">
                 🔄 Спробувати ще
             </button>
-            <button class="btn btn-next" style="margin-top: 15px; animation: none;" onclick="showDalgonaMenu()">
-                ← До вибору фігур
+            <button class="btn btn-secondary" style="margin-top: 15px;" onclick="startRandomDalgona()">
+                🎲 Інша фігура
+            </button>
+            <button class="btn btn-next" style="margin-top: 15px; animation: none;" onclick="showStart()">
+                ← На головну
             </button>
         </div>
     </div>
@@ -1976,7 +1979,7 @@
                 currentIndex: 0,
                 completed: false,
                 failed: false,
-                tolerance: 25 - shape.difficulty * 3
+                tolerance: 40 - shape.difficulty * 3
             };
 
             document.getElementById('dalgonaShapeName').textContent = shape.name;
@@ -1995,10 +1998,9 @@
             document.getElementById('needleCursor').style.display = 'block';
         }
 
-        // Start random dalgona (from result screen)
+        // Start random dalgona (from result screen or main menu)
         function startRandomDalgona() {
-            const easyShapes = dalgonaShapes.filter(s => s.difficulty <= 2);
-            const randomShape = easyShapes[Math.floor(Math.random() * easyShapes.length)];
+            const randomShape = dalgonaShapes[Math.floor(Math.random() * dalgonaShapes.length)];
             startDalgona(randomShape.id);
         }
 
