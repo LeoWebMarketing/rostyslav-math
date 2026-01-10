@@ -52,9 +52,24 @@ export interface DalgonaState {
   tolerance: number;
 }
 
+// ==================== RED LIGHT GREEN LIGHT TYPES ====================
+
+export type LightState = 'green' | 'red' | 'countdown';
+
+export interface RedLightState {
+  position: number;         // Player position (0-100)
+  light: LightState;        // Current light state
+  isMoving: boolean;        // Is player currently moving
+  timeLeft: number;         // Time remaining in seconds
+  gameStarted: boolean;     // Has game started
+  completed: boolean;       // Reached finish
+  failed: boolean;          // Caught moving on red
+  countdown: number;        // 3-2-1 countdown
+}
+
 // ==================== GAME STATE TYPES ====================
 
-export type Screen = 'start' | 'math' | 'mathResult' | 'dalgona' | 'dalgonaResult';
+export type Screen = 'start' | 'math' | 'mathResult' | 'dalgona' | 'dalgonaResult' | 'redLight' | 'redLightResult';
 
 export interface GameStats {
   date: string;

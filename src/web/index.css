@@ -517,11 +517,169 @@ input[type="number"] {
   50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
 }
 
+/* ==================== RED LIGHT GREEN LIGHT ==================== */
+
+/* Game Field */
+.game-field {
+  background: linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Doll */
+.doll {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 80px;
+  transition: transform 0.3s ease;
+}
+
+.doll-body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.doll-head {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+  position: relative;
+}
+
+.doll-head::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 15px solid #333;
+}
+
+.doll-eyes {
+  font-size: 16px;
+  animation: dollStare 0.5s ease;
+}
+
+@keyframes dollStare {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.doll-back {
+  transform: rotateY(180deg);
+}
+
+.doll-front {
+  transform: rotateY(0deg);
+}
+
+.doll-back .doll-head {
+  background: linear-gradient(135deg, #4a4a4a, #333);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Player */
+.player {
+  position: absolute;
+  bottom: 30px;
+  font-size: 32px;
+  transition: left 0.1s ease;
+  transform: scaleX(-1);
+}
+
+.player-running {
+  animation: playerBounce 0.15s ease infinite;
+}
+
+@keyframes playerBounce {
+  0%, 100% { transform: scaleX(-1) translateY(0); }
+  50% { transform: scaleX(-1) translateY(-5px); }
+}
+
+/* Light Indicator */
+.light-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.light-indicator.green {
+  animation: lightPulse 0.5s ease infinite;
+  box-shadow: 0 0 20px rgba(46, 213, 115, 0.8);
+}
+
+.light-indicator.red {
+  animation: lightPulse 0.3s ease infinite;
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
+}
+
+@keyframes lightPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Countdown */
+.countdown-number {
+  font-size: 5rem;
+  animation: countdownPop 0.5s ease;
+  color: var(--pink);
+  text-shadow: 0 0 30px var(--pink-glow);
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Red Light flash effect */
+.game-field.red-flash {
+  animation: redFlash 0.3s ease;
+}
+
+@keyframes redFlash {
+  0% { box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5); }
+  50% { box-shadow: inset 0 0 60px rgba(255, 0, 0, 0.5); }
+  100% { box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5); }
+}
+
 /* Responsive */
 @media (max-width: 400px) {
   .answer-input {
     width: 80px;
     height: 50px;
     font-size: 1.5rem;
+  }
+
+  .doll {
+    width: 50px;
+    height: 70px;
+  }
+
+  .doll-head {
+    width: 35px;
+    height: 35px;
+  }
+
+  .player {
+    font-size: 28px;
   }
 }

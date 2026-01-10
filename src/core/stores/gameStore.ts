@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { MathProblem, Screen, Shape, Point, DalgonaState } from '@core/types';
+import type { MathProblem, Screen, Shape, Point, DalgonaState, RedLightState, LightState } from '@core/types';
 import { generateSession, validateAnswer, getStars, getResultMessage } from '@core/games/math/mathEngine';
 import { getRandomShape, createDalgonaState, isOnPath, calculateProgress, isNearStartPoint } from '@core/games/dalgona/dalgonaEngine';
+import { createRedLightState, calculateMove } from '@core/games/redLight/redLightEngine';
 import { getTodayKey } from '@core/utils/storage';
 
 interface GameState {
@@ -18,6 +19,10 @@ interface GameState {
 
   // Dalgona game
   dalgona: DalgonaState;
+
+  // Red Light game
+  redLight: RedLightState;
+  lightChangeTime: number;
 
   // Stats
   todaySessions: number;
@@ -42,6 +47,14 @@ interface GameState {
   endDalgonaDrawing: () => void;
   restartDalgona: () => void;
 
+  // Actions - Red Light game
+  startRedLight: () => void;
+  startRedLightCountdown: () => void;
+  redLightTick: () => void;
+  redLightMove: () => void;
+  setRedLightLight: (light: LightState) => void;
+  restartRedLight: () => void;
+
   // Actions - Stats
   resetDailyStatsIfNeeded: () => void;
 }
@@ -59,6 +72,8 @@ export const useGameStore = create<GameState>()(
       streak: 0,
       isAnswerCorrect: null,
       dalgona: createDalgonaState(getRandomShape(), CANVAS_SIZE),
+      redLight: createRedLightState(),
+      lightChangeTime: 0,
       todaySessions: 0,
       todayCorrect: 0,
       bestScore: 0,
@@ -225,6 +240,120 @@ export const useGameStore = create<GameState>()(
             dalgona: createDalgonaState(dalgona.shape, CANVAS_SIZE),
           });
         }
+      },
+
+      // Red Light game actions
+      startRedLight: () => {
+        set({
+          screen: 'redLight',
+          redLight: createRedLightState(),
+          lightChangeTime: Date.now(),
+        });
+      },
+
+      startRedLightCountdown: () => {
+        const { redLight } = get();
+        if (redLight.countdown > 1) {
+          set({
+            redLight: {
+              ...redLight,
+              countdown: redLight.countdown - 1,
+            },
+          });
+        } else {
+          // Start the game
+          set({
+            redLight: {
+              ...redLight,
+              countdown: 0,
+              light: 'green',
+              gameStarted: true,
+            },
+            lightChangeTime: Date.now(),
+          });
+        }
+      },
+
+      redLightTick: () => {
+        const { redLight } = get();
+        if (!redLight.gameStarted || redLight.completed || redLight.failed) return;
+
+        const newTimeLeft = redLight.timeLeft - 1;
+
+        if (newTimeLeft <= 0) {
+          // Time's up
+          set({
+            redLight: {
+              ...redLight,
+              timeLeft: 0,
+              failed: true,
+            },
+            screen: 'redLightResult',
+          });
+        } else {
+          set({
+            redLight: {
+              ...redLight,
+              timeLeft: newTimeLeft,
+              isMoving: false, // Reset moving state each tick
+            },
+          });
+        }
+      },
+
+      redLightMove: () => {
+        const { redLight, lightChangeTime } = get();
+        if (!redLight.gameStarted || redLight.completed || redLight.failed) return;
+
+        const timeSinceLightChange = Date.now() - lightChangeTime;
+        const result = calculateMove(redLight.position, redLight.light, timeSinceLightChange);
+
+        if (result.caught) {
+          set({
+            redLight: {
+              ...redLight,
+              failed: true,
+              isMoving: true,
+            },
+            screen: 'redLightResult',
+          });
+        } else if (result.finished) {
+          set({
+            redLight: {
+              ...redLight,
+              position: result.newPosition,
+              completed: true,
+              isMoving: true,
+            },
+            screen: 'redLightResult',
+          });
+        } else {
+          set({
+            redLight: {
+              ...redLight,
+              position: result.newPosition,
+              isMoving: true,
+            },
+          });
+        }
+      },
+
+      setRedLightLight: (light) => {
+        set({
+          redLight: {
+            ...get().redLight,
+            light,
+          },
+          lightChangeTime: Date.now(),
+        });
+      },
+
+      restartRedLight: () => {
+        set({
+          screen: 'redLight',
+          redLight: createRedLightState(),
+          lightChangeTime: Date.now(),
+        });
       },
 
       // Stats

@@ -4,7 +4,9 @@ import {
   MathGame,
   MathResultScreen,
   DalgonaGame,
-  DalgonaResultScreen
+  DalgonaResultScreen,
+  RedLightGame,
+  RedLightResultScreen
 } from '@web/components/screens';
 
 export function App() {
@@ -22,6 +24,10 @@ export function App() {
         return <DalgonaGame />;
       case 'dalgonaResult':
         return <DalgonaResultScreen />;
+      case 'redLight':
+        return <RedLightGame />;
+      case 'redLightResult':
+        return <RedLightResultScreen />;
       default:
         return <StartScreen />;
     }

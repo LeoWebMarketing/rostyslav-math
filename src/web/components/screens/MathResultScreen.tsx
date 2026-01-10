@@ -8,12 +8,13 @@ export function MathResultScreen() {
     bestScore,
     goToStart,
     startMathGame,
-    startDalgona
+    startDalgona,
+    startRedLight
   } = useGameStore();
 
   const total = mathProblems.length;
   const isNewBest = correctAnswers > bestScore;
-  const showDalgonaBonus = correctAnswers >= 8;
+  const showBonusGames = correctAnswers >= 8;
 
   const getStars = () => {
     if (correctAnswers >= 10) return '⭐⭐⭐';
@@ -63,10 +64,10 @@ export function MathResultScreen() {
         </div>
       )}
 
-      {/* Dalgona Bonus */}
-      {showDalgonaBonus && (
+      {/* Bonus Games */}
+      {showBonusGames && (
         <div className="bonus-unlock mb-6">
-          🎉 Бонус розблоковано: Dalgona!
+          🎉 Бонусні ігри розблоковано!
         </div>
       )}
 
@@ -75,10 +76,15 @@ export function MathResultScreen() {
         <Button variant="success" onClick={startMathGame}>
           Грати ще раз
         </Button>
-        {showDalgonaBonus && (
-          <Button variant="secondary" onClick={() => startDalgona()}>
-            🍪 Грати в Dalgona
-          </Button>
+        {showBonusGames && (
+          <>
+            <Button variant="secondary" onClick={() => startDalgona()}>
+              🍪 Dalgona
+            </Button>
+            <Button variant="primary" onClick={startRedLight}>
+              🚦 Червоне Світло
+            </Button>
+          </>
         )}
         <Button variant="next" onClick={goToStart} className="!animate-none">
           На головну
