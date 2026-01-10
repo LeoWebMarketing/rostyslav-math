@@ -2,7 +2,7 @@ import { useGameStore } from '@core/stores/gameStore';
 import { Button } from '@web/components/ui/Button';
 
 export function StartScreen() {
-  const { startMathGame, startDalgona, bestScore, todaySessions, todayCorrect } = useGameStore();
+  const { startMathGame, bestScore, todaySessions, todayCorrect } = useGameStore();
 
   return (
     <div className="screen-fade-in flex flex-col items-center justify-center flex-grow px-5 py-6">
@@ -57,10 +57,7 @@ export function StartScreen() {
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full max-w-sm">
         <Button variant="primary" onClick={startMathGame}>
-          🎮 Математика
-        </Button>
-        <Button variant="secondary" onClick={() => startDalgona()}>
-          🍪 Dalgona Гра
+          🎮 Почати гру
         </Button>
       </div>
     </div>
