@@ -9,7 +9,8 @@ export function MathResultScreen() {
     goToStart,
     startMathGame,
     startDalgona,
-    startRedLight
+    startRedLight,
+    startGlassBridge
   } = useGameStore();
 
   const total = mathProblems.length;
@@ -83,6 +84,9 @@ export function MathResultScreen() {
             </Button>
             <Button variant="primary" onClick={startRedLight}>
               🚦 Червоне Світло
+            </Button>
+            <Button variant="secondary" onClick={() => startGlassBridge()}>
+              🌉 Скляний Міст
             </Button>
           </>
         )}

@@ -36,3 +36,10 @@ export function vibrateFail(): void {
 export function vibrateSuccess(): void {
   vibrate(50); // Single short pulse
 }
+
+/**
+ * Light tap for correct step
+ */
+export function vibrateCorrect(): void {
+  vibrate(30); // Very short pulse
+}

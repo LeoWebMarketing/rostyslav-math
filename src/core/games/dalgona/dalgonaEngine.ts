@@ -312,9 +312,12 @@ export function getShapeById(id: string): Shape | undefined {
 
 /**
  * Calculate tolerance based on difficulty
+ * Increased for better mobile experience
  */
 export function getTolerance(difficulty: 1 | 2 | 3): number {
-  return 40 - difficulty * 3; // 37, 34, 31
+  // Was: 40 - difficulty * 3 (37, 34, 31)
+  // Now: 50 - difficulty * 3 (47, 44, 41) - easier on mobile
+  return 50 - difficulty * 3;
 }
 
 /**
@@ -357,6 +360,7 @@ export function calculateProgress(currentIndex: number, totalPoints: number): nu
 
 /**
  * Check if near start point
+ * Using larger tolerance (3x) to make it easier to start on mobile
  */
 export function isNearStartPoint(
   point: Point,
@@ -368,7 +372,8 @@ export function isNearStartPoint(
   const dist = Math.sqrt(
     Math.pow(point.x - startPoint.x, 2) + Math.pow(point.y - startPoint.y, 2)
   );
-  return dist <= tolerance * 1.5;
+  // Use 3x tolerance for easier start on mobile (was 1.5x)
+  return dist <= tolerance * 3;
 }
 
 /**

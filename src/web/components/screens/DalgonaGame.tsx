@@ -91,22 +91,37 @@ export function DalgonaGame() {
         ctx.shadowBlur = 0;
       }
 
-      // Draw start point indicator
+      // Draw start point indicator - LARGE and obvious
       if (!isDrawing && progress < 5) {
         const startPoint = path[0];
+
+        // Large outer glow
+        const pulseSize = 35 + Math.sin(Date.now() / 150) * 8;
         ctx.beginPath();
-        ctx.arc(startPoint.x, startPoint.y, 15, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 245, 212, 0.3)';
+        ctx.arc(startPoint.x, startPoint.y, pulseSize, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 245, 212, 0.2)';
+        ctx.fill();
+
+        // Main circle - larger
+        ctx.beginPath();
+        ctx.arc(startPoint.x, startPoint.y, 25, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 245, 212, 0.5)';
         ctx.fill();
         ctx.strokeStyle = '#00F5D4';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Pulsing animation
+        // Inner dot
         ctx.beginPath();
-        ctx.arc(startPoint.x, startPoint.y, 20 + Math.sin(Date.now() / 200) * 5, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(0, 245, 212, 0.5)';
-        ctx.lineWidth = 1;
+        ctx.arc(startPoint.x, startPoint.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#00F5D4';
+        ctx.fill();
+
+        // Pulsing outer ring animation
+        ctx.beginPath();
+        ctx.arc(startPoint.x, startPoint.y, 30 + Math.sin(Date.now() / 200) * 10, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0, 245, 212, 0.6)';
+        ctx.lineWidth = 2;
         ctx.stroke();
       }
     }
@@ -157,14 +172,14 @@ export function DalgonaGame() {
     };
   }, []);
 
-  // Native event handlers
+  // Native event handlers - KEY: passive: false + preventDefault on touchmove
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const handleStart = (e: TouchEvent | MouseEvent) => {
-      e.preventDefault();
+    const handleTouchStart = (e: TouchEvent) => {
       if (completed || failed) return;
+      e.preventDefault(); // Also prevent default on start
 
       const point = getPoint(e);
       if (point) {
@@ -173,7 +188,9 @@ export function DalgonaGame() {
       }
     };
 
-    const handleMove = (e: TouchEvent | MouseEvent) => {
+    const handleTouchMove = (e: TouchEvent) => {
+      // CRITICAL: UNCONDITIONAL preventDefault - must be FIRST, before any logic
+      // This is how it worked in original HTML version
       e.preventDefault();
 
       const point = getPoint(e);
@@ -186,33 +203,57 @@ export function DalgonaGame() {
       }
     };
 
-    const handleEnd = (e: TouchEvent | MouseEvent) => {
-      e.preventDefault();
+    const handleTouchEnd = () => {
       setNeedlePos(prev => ({ ...prev, visible: false }));
       endDalgonaDrawing();
     };
 
-    // Add event listeners with passive: false for touch events
-    canvas.addEventListener('touchstart', handleStart, { passive: false });
-    canvas.addEventListener('touchmove', handleMove, { passive: false });
-    canvas.addEventListener('touchend', handleEnd, { passive: false });
-    canvas.addEventListener('touchcancel', handleEnd, { passive: false });
+    // Mouse handlers (for desktop testing)
+    const handleMouseDown = (e: MouseEvent) => {
+      if (completed || failed) return;
+      const point = getPoint(e);
+      if (point) {
+        setNeedlePos({ x: point.screenX, y: point.screenY, visible: true });
+        startDalgonaDrawing({ x: point.x, y: point.y });
+      }
+    };
 
-    canvas.addEventListener('mousedown', handleStart);
-    canvas.addEventListener('mousemove', handleMove);
-    canvas.addEventListener('mouseup', handleEnd);
-    canvas.addEventListener('mouseleave', handleEnd);
+    const handleMouseMove = (e: MouseEvent) => {
+      const point = getPoint(e);
+      if (point) {
+        setNeedlePos({ x: point.screenX, y: point.screenY, visible: true });
+        if (isDrawing && !completed && !failed) {
+          updateDalgonaDrawing({ x: point.x, y: point.y });
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setNeedlePos(prev => ({ ...prev, visible: false }));
+      endDalgonaDrawing();
+    };
+
+    // CRITICAL: passive: false allows preventDefault() to work
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mouseleave', handleMouseUp);
 
     return () => {
-      canvas.removeEventListener('touchstart', handleStart);
-      canvas.removeEventListener('touchmove', handleMove);
-      canvas.removeEventListener('touchend', handleEnd);
-      canvas.removeEventListener('touchcancel', handleEnd);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleTouchEnd);
+      canvas.removeEventListener('touchcancel', handleTouchEnd);
 
-      canvas.removeEventListener('mousedown', handleStart);
-      canvas.removeEventListener('mousemove', handleMove);
-      canvas.removeEventListener('mouseup', handleEnd);
-      canvas.removeEventListener('mouseleave', handleEnd);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('mouseleave', handleMouseUp);
     };
   }, [getPoint, isDrawing, completed, failed, startDalgonaDrawing, updateDalgonaDrawing, endDalgonaDrawing]);
 
@@ -256,8 +297,9 @@ export function DalgonaGame() {
 
   const status = getStatus();
 
+
   return (
-    <div className="screen-fade-in flex flex-col items-center flex-grow px-5 py-6" ref={containerRef}>
+    <div className="dalgona-screen screen-fade-in flex flex-col items-center px-5 py-6 bg-dark" ref={containerRef}>
       {/* Needle cursor */}
       {needlePos.visible && (
         <div
@@ -321,11 +363,7 @@ export function DalgonaGame() {
           ref={canvasRef}
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
-          className="rounded-full cursor-none select-none"
-          style={{
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), inset 0 -5px 20px rgba(0, 0, 0, 0.3), 0 0 60px rgba(212, 165, 116, 0.3)',
-            touchAction: 'none',
-          }}
+          className="dalgona-canvas rounded-full cursor-none select-none"
         />
 
         {/* Result Overlay */}
@@ -344,7 +382,9 @@ export function DalgonaGame() {
       {/* Instructions */}
       <p className="text-center text-teal text-sm mb-6 bg-dark p-3 rounded-xl border border-gray">
         {status === 'playing'
-          ? '👆 Проведи пальцем по контуру фігури!'
+          ? (isDrawing
+              ? '👆 Веди пальцем по контуру!'
+              : '👆 Натисни на зелену точку і веди по контуру!')
           : status === 'won'
           ? '🏆 Чудова робота!'
           : '😢 Спробуй ще раз!'}

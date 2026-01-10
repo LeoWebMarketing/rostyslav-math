@@ -1,9 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { MathProblem, Screen, Shape, Point, DalgonaState, RedLightState, LightState } from '@core/types';
+import type { MathProblem, Screen, Shape, Point, DalgonaState, RedLightState, LightState, GlassBridgeState, TugOfWarState, MarblesState, ZumaState } from '@core/types';
 import { generateSession, validateAnswer, getStars, getResultMessage } from '@core/games/math/mathEngine';
 import { getRandomShape, createDalgonaState, isOnPath, calculateProgress, isNearStartPoint } from '@core/games/dalgona/dalgonaEngine';
 import { createRedLightState, calculateMove } from '@core/games/redLight/redLightEngine';
+import { createGlassBridge, stepOnPanel } from '@core/games/glassBridge/glassBridgeEngine';
+import { createTugOfWarState, calculateRopeMove } from '@core/games/tugOfWar/tugOfWarEngine';
+import { createMarblesState, generateMarblesProblem, calculateMarblesResult } from '@core/games/marbles/marblesEngine';
+import { createZumaState } from '@core/games/zuma/zumaEngine';
 import { getTodayKey } from '@core/utils/storage';
 
 interface GameState {
@@ -23,6 +27,18 @@ interface GameState {
   // Red Light game
   redLight: RedLightState;
   lightChangeTime: number;
+
+  // Glass Bridge game
+  glassBridge: GlassBridgeState;
+
+  // Tug of War game
+  tugOfWar: TugOfWarState;
+
+  // Marbles game
+  marbles: MarblesState;
+
+  // Zuma game
+  zuma: ZumaState;
 
   // Stats
   todaySessions: number;
@@ -55,6 +71,29 @@ interface GameState {
   setRedLightLight: (light: LightState) => void;
   restartRedLight: () => void;
 
+  // Actions - Glass Bridge game
+  startGlassBridge: (rows?: number) => void;
+  glassBridgeStep: (panelId: number) => void;
+  restartGlassBridge: () => void;
+
+  // Actions - Tug of War game
+  startTugOfWar: () => void;
+  answerTugOfWar: (answer: number) => void;
+  restartTugOfWar: () => void;
+
+  // Actions - Marbles game
+  startMarbles: () => void;
+  setMarblesBet: (bet: number) => void;
+  setMarblesGuess: (guess: 'odd' | 'even') => void;
+  answerMarbles: (answer: number) => void;
+  nextMarblesRound: () => void;
+  restartMarbles: () => void;
+
+  // Actions - Zuma game
+  startZuma: (level?: number) => void;
+  setZumaState: (state: ZumaState) => void;
+  restartZuma: () => void;
+
   // Actions - Stats
   resetDailyStatsIfNeeded: () => void;
 }
@@ -74,6 +113,10 @@ export const useGameStore = create<GameState>()(
       dalgona: createDalgonaState(getRandomShape(), CANVAS_SIZE),
       redLight: createRedLightState(),
       lightChangeTime: 0,
+      glassBridge: createGlassBridge(),
+      tugOfWar: createTugOfWarState(),
+      marbles: createMarblesState(),
+      zuma: createZumaState(),
       todaySessions: 0,
       todayCorrect: 0,
       bestScore: 0,
@@ -353,6 +396,195 @@ export const useGameStore = create<GameState>()(
           screen: 'redLight',
           redLight: createRedLightState(),
           lightChangeTime: Date.now(),
+        });
+      },
+
+      // Glass Bridge game actions
+      startGlassBridge: (rows) => {
+        set({
+          screen: 'glassBridge',
+          glassBridge: createGlassBridge(rows),
+        });
+      },
+
+      glassBridgeStep: (panelId) => {
+        const { glassBridge } = get();
+        if (glassBridge.completed || glassBridge.failed) return;
+
+        const result = stepOnPanel(glassBridge, panelId);
+
+        if (result.newState.completed || result.newState.failed) {
+          set({
+            glassBridge: result.newState,
+            screen: 'glassBridgeResult',
+          });
+        } else {
+          set({
+            glassBridge: result.newState,
+          });
+        }
+      },
+
+      restartGlassBridge: () => {
+        const { glassBridge } = get();
+        set({
+          screen: 'glassBridge',
+          glassBridge: createGlassBridge(glassBridge.totalRows),
+        });
+      },
+
+      // Tug of War game actions
+      startTugOfWar: () => {
+        set({
+          screen: 'tugOfWar',
+          tugOfWar: createTugOfWarState(),
+        });
+      },
+
+      answerTugOfWar: (answer) => {
+        const { tugOfWar } = get();
+        if (tugOfWar.isAnswering || tugOfWar.completed || tugOfWar.failed) return;
+
+        const currentProblem = tugOfWar.problems[tugOfWar.currentProblemIndex];
+        const isCorrect = answer === currentProblem.answer;
+        const result = calculateRopeMove(tugOfWar.ropePosition, isCorrect);
+
+        if (result.completed || result.failed) {
+          set({
+            tugOfWar: {
+              ...tugOfWar,
+              ropePosition: result.newPosition,
+              completed: result.completed,
+              failed: result.failed,
+              isAnswering: true,
+            },
+            screen: 'tugOfWarResult',
+          });
+        } else {
+          // Move to next problem
+          set({
+            tugOfWar: {
+              ...tugOfWar,
+              ropePosition: result.newPosition,
+              currentProblemIndex: tugOfWar.currentProblemIndex + 1,
+            },
+          });
+        }
+      },
+
+      restartTugOfWar: () => {
+        set({
+          screen: 'tugOfWar',
+          tugOfWar: createTugOfWarState(),
+        });
+      },
+
+      // Marbles game actions
+      startMarbles: () => {
+        set({
+          screen: 'marbles',
+          marbles: createMarblesState(),
+        });
+      },
+
+      setMarblesBet: (bet) => {
+        const { marbles } = get();
+        if (marbles.phase !== 'bet') return;
+
+        set({
+          marbles: {
+            ...marbles,
+            currentBet: Math.min(bet, marbles.playerMarbles),
+            phase: 'guess',
+          },
+        });
+      },
+
+      setMarblesGuess: (guess) => {
+        const { marbles } = get();
+        if (marbles.phase !== 'guess') return;
+
+        set({
+          marbles: {
+            ...marbles,
+            playerGuess: guess,
+            problem: generateMarblesProblem(),
+            phase: 'solve',
+          },
+        });
+      },
+
+      answerMarbles: (answer) => {
+        const { marbles } = get();
+        if (marbles.phase !== 'solve' || !marbles.problem) return;
+
+        const result = calculateMarblesResult(marbles, answer);
+
+        const newState = {
+          ...marbles,
+          playerMarbles: result.newPlayerMarbles,
+          opponentMarbles: result.newOpponentMarbles,
+          roundResult: result.won ? 'win' as const : 'lose' as const,
+          phase: 'result' as const,
+        };
+
+        // Check for game end
+        if (result.newPlayerMarbles <= 0) {
+          set({
+            marbles: { ...newState, failed: true },
+            screen: 'marblesResult',
+          });
+        } else if (result.newOpponentMarbles <= 0) {
+          set({
+            marbles: { ...newState, completed: true },
+            screen: 'marblesResult',
+          });
+        } else {
+          set({ marbles: newState });
+        }
+      },
+
+      nextMarblesRound: () => {
+        const { marbles } = get();
+        if (marbles.phase !== 'result') return;
+
+        set({
+          marbles: {
+            ...marbles,
+            currentBet: 1,
+            playerGuess: null,
+            problem: null,
+            phase: 'bet',
+            roundResult: null,
+          },
+        });
+      },
+
+      restartMarbles: () => {
+        set({
+          screen: 'marbles',
+          marbles: createMarblesState(),
+        });
+      },
+
+      // Zuma game actions
+      startZuma: (level = 1) => {
+        set({
+          screen: 'zuma',
+          zuma: createZumaState(level),
+        });
+      },
+
+      setZumaState: (zumaState) => {
+        set({ zuma: zumaState });
+      },
+
+      restartZuma: () => {
+        const { zuma } = get();
+        const nextLevel = zuma.completed ? zuma.level + 1 : zuma.level;
+        set({
+          screen: 'zuma',
+          zuma: createZumaState(nextLevel),
         });
       },
 
