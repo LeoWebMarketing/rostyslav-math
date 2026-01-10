@@ -165,28 +165,6 @@ export const SHAPES: Shape[] = [
     }
   },
   {
-    id: 'moon',
-    name: 'Місяць',
-    icon: '🌙',
-    difficulty: 2,
-    getPath: (cx, cy, r) => {
-      const points: Point[] = [];
-      // Outer arc (full circle right side)
-      for (let i = -120; i <= 120; i += 5) {
-        const rad = i * Math.PI / 180;
-        points.push({ x: cx + Math.cos(rad) * r, y: cy + Math.sin(rad) * r });
-      }
-      // Inner arc (smaller, offset to create crescent)
-      for (let i = 120; i >= -120; i -= 5) {
-        const rad = i * Math.PI / 180;
-        const innerR = r * 0.65;
-        const offsetX = r * 0.4;
-        points.push({ x: cx + offsetX + Math.cos(rad) * innerR, y: cy + Math.sin(rad) * innerR });
-      }
-      return points;
-    }
-  },
-  {
     id: 'tree',
     name: 'Ялинка',
     icon: '🎄',

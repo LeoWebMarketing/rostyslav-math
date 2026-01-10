@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { useGameStore } from '@core/stores/gameStore';
 import { Button } from '@web/components/ui/Button';
 
@@ -6,6 +6,9 @@ const CANVAS_SIZE = 300;
 
 export function DalgonaGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [needlePos, setNeedlePos] = useState({ x: 0, y: 0, visible: false });
+  const [needleState, setNeedleState] = useState<'normal' | 'on-path' | 'off-path'>('normal');
 
   const {
     dalgona,
@@ -97,6 +100,13 @@ export function DalgonaGame() {
         ctx.strokeStyle = '#00F5D4';
         ctx.lineWidth = 2;
         ctx.stroke();
+
+        // Pulsing animation
+        ctx.beginPath();
+        ctx.arc(startPoint.x, startPoint.y, 20 + Math.sin(Date.now() / 200) * 5, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0, 245, 212, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
       }
     }
 
@@ -109,10 +119,16 @@ export function DalgonaGame() {
 
   useEffect(() => {
     drawDalgona();
-  }, [drawDalgona]);
 
-  // Handle drawing
-  const getCanvasPoint = (e: React.MouseEvent | React.TouchEvent) => {
+    // Animate start point
+    if (!isDrawing && progress < 5 && !completed && !failed) {
+      const interval = setInterval(drawDalgona, 50);
+      return () => clearInterval(interval);
+    }
+  }, [drawDalgona, isDrawing, progress, completed, failed]);
+
+  // Get point from event
+  const getPoint = useCallback((e: TouchEvent | MouseEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 
@@ -120,41 +136,95 @@ export function DalgonaGame() {
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    if ('touches' in e) {
-      const touch = e.touches[0];
-      return {
-        x: (touch.clientX - rect.left) * scaleX,
-        y: (touch.clientY - rect.top) * scaleY,
-      };
+    let clientX: number, clientY: number;
+
+    if ('touches' in e && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if ('clientX' in e) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else {
+      return null;
     }
 
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY,
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+      screenX: clientX,
+      screenY: clientY,
     };
-  };
+  }, []);
 
-  const handleStart = (e: React.MouseEvent | React.TouchEvent) => {
-    if (completed || failed) return;
-    const point = getCanvasPoint(e);
-    if (point) {
-      startDalgonaDrawing(point);
+  // Native event handlers
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleStart = (e: TouchEvent | MouseEvent) => {
+      e.preventDefault();
+      if (completed || failed) return;
+
+      const point = getPoint(e);
+      if (point) {
+        setNeedlePos({ x: point.screenX, y: point.screenY, visible: true });
+        startDalgonaDrawing({ x: point.x, y: point.y });
+      }
+    };
+
+    const handleMove = (e: TouchEvent | MouseEvent) => {
+      e.preventDefault();
+
+      const point = getPoint(e);
+      if (point) {
+        setNeedlePos({ x: point.screenX, y: point.screenY, visible: true });
+
+        if (isDrawing && !completed && !failed) {
+          updateDalgonaDrawing({ x: point.x, y: point.y });
+        }
+      }
+    };
+
+    const handleEnd = (e: TouchEvent | MouseEvent) => {
+      e.preventDefault();
+      setNeedlePos(prev => ({ ...prev, visible: false }));
+      endDalgonaDrawing();
+    };
+
+    // Add event listeners with passive: false for touch events
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    canvas.addEventListener('touchmove', handleMove, { passive: false });
+    canvas.addEventListener('touchend', handleEnd, { passive: false });
+    canvas.addEventListener('touchcancel', handleEnd, { passive: false });
+
+    canvas.addEventListener('mousedown', handleStart);
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('mouseup', handleEnd);
+    canvas.addEventListener('mouseleave', handleEnd);
+
+    return () => {
+      canvas.removeEventListener('touchstart', handleStart);
+      canvas.removeEventListener('touchmove', handleMove);
+      canvas.removeEventListener('touchend', handleEnd);
+      canvas.removeEventListener('touchcancel', handleEnd);
+
+      canvas.removeEventListener('mousedown', handleStart);
+      canvas.removeEventListener('mousemove', handleMove);
+      canvas.removeEventListener('mouseup', handleEnd);
+      canvas.removeEventListener('mouseleave', handleEnd);
+    };
+  }, [getPoint, isDrawing, completed, failed, startDalgonaDrawing, updateDalgonaDrawing, endDalgonaDrawing]);
+
+  // Update needle state based on drawing status
+  useEffect(() => {
+    if (!isDrawing) {
+      setNeedleState('normal');
+    } else if (lives < 3) {
+      setNeedleState('off-path');
+    } else {
+      setNeedleState('on-path');
     }
-  };
-
-  const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    if (!isDrawing || completed || failed) return;
-
-    const point = getCanvasPoint(e);
-    if (point) {
-      updateDalgonaDrawing(point);
-    }
-  };
-
-  const handleEnd = () => {
-    endDalgonaDrawing();
-  };
+  }, [isDrawing, lives]);
 
   // Progress ring calculation
   const circumference = 2 * Math.PI * 155;
@@ -169,7 +239,18 @@ export function DalgonaGame() {
   const status = getStatus();
 
   return (
-    <div className="screen-fade-in flex flex-col items-center flex-grow px-5 py-6">
+    <div className="screen-fade-in flex flex-col items-center flex-grow px-5 py-6" ref={containerRef}>
+      {/* Needle cursor */}
+      {needlePos.visible && (
+        <div
+          className={`needle-cursor ${needleState}`}
+          style={{
+            left: needlePos.x,
+            top: needlePos.y,
+          }}
+        />
+      )}
+
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-2xl font-bold text-caramel mb-1" style={{ textShadow: '0 0 15px rgba(212, 165, 116, 0.5)' }}>
@@ -188,7 +269,9 @@ export function DalgonaGame() {
           <div className="text-sm text-gray-400">Життя</div>
           <div className="flex gap-1 justify-center">
             {[1, 2, 3].map((i) => (
-              <span key={i} className={`life ${i > lives ? 'lost' : ''}`}>💖</span>
+              <span key={i} className={`text-xl transition-all ${i > lives ? 'opacity-30 scale-75' : 'animate-pulse'}`}>
+                {i > lives ? '🖤' : '❤️'}
+              </span>
             ))}
           </div>
         </div>
@@ -220,17 +303,11 @@ export function DalgonaGame() {
           ref={canvasRef}
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
-          className="rounded-full cursor-crosshair touch-none"
+          className="rounded-full cursor-none select-none"
           style={{
             boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), inset 0 -5px 20px rgba(0, 0, 0, 0.3), 0 0 60px rgba(212, 165, 116, 0.3)',
+            touchAction: 'none',
           }}
-          onMouseDown={handleStart}
-          onMouseMove={handleMove}
-          onMouseUp={handleEnd}
-          onMouseLeave={handleEnd}
-          onTouchStart={handleStart}
-          onTouchMove={handleMove}
-          onTouchEnd={handleEnd}
         />
 
         {/* Result Overlay */}
