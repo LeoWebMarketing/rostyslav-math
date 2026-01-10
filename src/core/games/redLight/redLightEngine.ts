@@ -7,10 +7,10 @@ export const GAME_CONFIG = {
   GAME_DURATION: 30,          // Total game time in seconds
   MOVE_DISTANCE: 2,           // Distance per tap
   FINISH_LINE: 100,           // Finish position
-  MIN_GREEN_TIME: 2000,       // Min green light duration (ms)
-  MAX_GREEN_TIME: 4000,       // Max green light duration (ms)
-  MIN_RED_TIME: 1500,         // Min red light duration (ms)
-  MAX_RED_TIME: 3000,         // Max red light duration (ms)
+  MIN_GREEN_TIME: 800,        // Min green light duration (ms) - can be very short!
+  MAX_GREEN_TIME: 5000,       // Max green light duration (ms)
+  MIN_RED_TIME: 800,          // Min red light duration (ms)
+  MAX_RED_TIME: 4000,         // Max red light duration (ms)
   REACTION_GRACE: 150,        // Grace period after light change (ms)
 };
 

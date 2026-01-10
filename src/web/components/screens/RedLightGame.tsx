@@ -167,7 +167,7 @@ export function RedLightGame() {
         {/* Player */}
         <div
           className={`player ${redLight.isMoving ? 'player-running' : ''}`}
-          style={{ left: `${Math.min(position, 85)}%` }}
+          style={{ left: `${(position / 100) * 88}%` }}
         >
           🏃
         </div>
