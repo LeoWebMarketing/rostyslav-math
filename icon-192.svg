@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff4da6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="#0f0f1a"/>
+  <circle cx="96" cy="96" r="65" fill="none" stroke="url(#grad)" stroke-width="8"/>
+  <!-- Squid simplified -->
+  <ellipse cx="96" cy="85" rx="30" ry="35" fill="#FF0080"/>
+  <circle cx="86" cy="78" r="8" fill="white"/>
+  <circle cx="106" cy="78" r="8" fill="white"/>
+  <circle cx="86" cy="78" r="4" fill="#0f0f1a"/>
+  <circle cx="106" cy="78" r="4" fill="#0f0f1a"/>
+  <!-- Tentacles -->
+  <path d="M70 110 Q65 130 60 145" stroke="#FF0080" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M80 115 Q78 135 75 150" stroke="#FF0080" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M96 118 Q96 140 96 155" stroke="#FF0080" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M112 115 Q114 135 117 150" stroke="#FF0080" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M122 110 Q127 130 132 145" stroke="#FF0080" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>
