@@ -694,7 +694,7 @@
             <div class="logo">SQUID MATH</div>
             <div class="stats">
                 <span>Сесій: <strong id="sessionsToday">0</strong></span>
-                <span>Рекорд: <strong id="bestScore">0</strong></span>
+                <span>Правильно: <strong id="todayTotal">0</strong></span>
             </div>
             <div class="streak" id="streakCounter">
                 <span class="streak-fire">🔥</span>
@@ -914,7 +914,7 @@
         function updateStatsUI() {
             const stats = loadStats();
             document.getElementById('sessionsToday').textContent = stats.sessions;
-            document.getElementById('bestScore').textContent = stats.best;
+            document.getElementById('todayTotal').textContent = stats.correct;
             document.getElementById('todaySessions').textContent = stats.sessions;
             document.getElementById('todayCorrect').textContent = stats.correct;
         }
