@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useGameStore } from '@core/stores/gameStore';
 import {
   StartScreen,
@@ -10,7 +11,21 @@ import {
 } from '@web/components/screens';
 
 export function App() {
-  const { screen } = useGameStore();
+  const { screen, startDalgona, startRedLight, startMathGame } = useGameStore();
+
+  // Secret URL params for direct game access
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const game = params.get('game');
+
+    if (game === 'dalgona') {
+      startDalgona();
+    } else if (game === 'redlight' || game === 'red') {
+      startRedLight();
+    } else if (game === 'math') {
+      startMathGame();
+    }
+  }, [startDalgona, startRedLight, startMathGame]);
 
   const renderScreen = () => {
     switch (screen) {
