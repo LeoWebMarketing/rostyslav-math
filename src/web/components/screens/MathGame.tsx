@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useGameStore, selectCurrentProblem, selectMathProgress } from '@core/stores/gameStore';
 import { ProgressBar } from '@web/components/ui/ProgressBar';
 import { Button } from '@web/components/ui/Button';
+import { vibrateWrong } from '@core/utils/vibration';
 
 export function MathGame() {
   const currentProblem = useGameStore(selectCurrentProblem);
@@ -33,7 +34,8 @@ export function MathGame() {
       if (isAnswerCorrect) {
         setShowNext(true);
       } else {
-        // Wrong answer - allow retry after shake
+        // Wrong answer - vibrate and allow retry after shake
+        vibrateWrong();
         const timer = setTimeout(() => {
           setAnswer('');
           inputRef.current?.focus();

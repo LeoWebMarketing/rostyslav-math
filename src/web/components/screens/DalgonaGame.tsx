@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { useGameStore } from '@core/stores/gameStore';
 import { Button } from '@web/components/ui/Button';
+import { vibrateWrong, vibrateFail } from '@core/utils/vibration';
 
 const CANVAS_SIZE = 300;
 
@@ -225,6 +226,23 @@ export function DalgonaGame() {
       setNeedleState('on-path');
     }
   }, [isDrawing, lives]);
+
+  // Track previous lives for vibration
+  const prevLivesRef = useRef(lives);
+  useEffect(() => {
+    if (lives < prevLivesRef.current) {
+      // Lost a life - vibrate
+      vibrateWrong();
+    }
+    prevLivesRef.current = lives;
+  }, [lives]);
+
+  // Vibrate on game fail
+  useEffect(() => {
+    if (failed) {
+      vibrateFail();
+    }
+  }, [failed]);
 
   // Progress ring calculation
   const circumference = 2 * Math.PI * 155;
