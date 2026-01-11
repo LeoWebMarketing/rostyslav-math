@@ -2,7 +2,7 @@ import { useGameStore } from '@core/stores/gameStore';
 import { Button } from '@web/components/ui/Button';
 
 export function StartScreen() {
-  const { startMathGame, startDalgona, startRedLight, startGlassBridge, startTugOfWar, startMarbles, startZuma, bestScore, todaySessions, todayCorrect } = useGameStore();
+  const { startMathGame, /* startDalgona, */ startRedLight, startGlassBridge, startTugOfWar, startMarbles, startZuma, bestScore, todaySessions, todayCorrect } = useGameStore();
 
   return (
     <div className="screen-fade-in flex flex-col items-center justify-center flex-grow px-5 py-6">
@@ -65,6 +65,7 @@ export function StartScreen() {
       <div className="w-full max-w-sm mt-8">
         <h3 className="text-teal mb-3 text-center text-sm">Міні-ігри:</h3>
         <div className="grid grid-cols-3 gap-2">
+{/* Dalgona hidden - iOS touch issues
           <button
             onClick={() => startDalgona()}
             className="p-3 bg-dark-lighter rounded-lg hover:bg-pink/20 transition-colors text-center"
@@ -72,6 +73,7 @@ export function StartScreen() {
             <div className="text-2xl mb-1">🍬</div>
             <div className="text-xs text-gray-400">Далгона</div>
           </button>
+*/}
           <button
             onClick={startRedLight}
             className="p-3 bg-dark-lighter rounded-lg hover:bg-pink/20 transition-colors text-center"

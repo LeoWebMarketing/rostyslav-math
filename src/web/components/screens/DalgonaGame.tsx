@@ -172,14 +172,96 @@ export function DalgonaGame() {
     };
   }, []);
 
+  // Track if we're currently touching the canvas
+  const isTouchingCanvasRef = useRef(false);
+
+  // SCROLL BLOCK - iOS Safari fix
+  // Safari needs position: relative + overflow: hidden on BOTH html and body
+  const blockScroll = useCallback(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    // Save current scroll position
+    const scrollY = window.scrollY;
+
+    // Apply scroll lock - Safari needs position: relative specifically
+    html.style.position = 'relative';
+    html.style.overflow = 'hidden';
+    body.style.position = 'relative';
+    body.style.overflow = 'hidden';
+    body.style.height = '100%';
+
+    // Prevent scroll position jump
+    body.style.top = `-${scrollY}px`;
+  }, []);
+
+  const allowScroll = useCallback(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    // Get scroll position from body.top
+    const scrollY = Math.abs(parseInt(body.style.top || '0', 10));
+
+    // Remove scroll lock
+    html.style.position = '';
+    html.style.overflow = '';
+    body.style.position = '';
+    body.style.overflow = '';
+    body.style.height = '';
+    body.style.top = '';
+
+    // Restore scroll position
+    window.scrollTo(0, scrollY);
+  }, []);
+
+  // Apply scroll block when component mounts (during game)
+  useEffect(() => {
+    blockScroll();
+    return () => allowScroll();
+  }, [blockScroll, allowScroll]);
+
+  // CRITICAL: Global document-level scroll prevention for iOS Safari
+  // Must be set up BEFORE any touch events happen - this is key for iOS
+  useEffect(() => {
+    const preventScroll = (e: TouchEvent) => {
+      // Only prevent if we're touching the canvas area
+      if (isTouchingCanvasRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    // iOS Safari requires BOTH touchstart and touchmove to be prevented
+    // Also need touchforcechange for iOS 11+
+    // passive: false is CRITICAL - without it preventDefault doesn't work
+    document.addEventListener('touchstart', preventScroll, { passive: false });
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    // @ts-expect-error - touchforcechange is iOS specific
+    document.addEventListener('touchforcechange', preventScroll, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchstart', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
+      // @ts-expect-error - touchforcechange is iOS specific
+      document.removeEventListener('touchforcechange', preventScroll);
+    };
+  }, []);
+
   // Native event handlers - KEY: passive: false + preventDefault on touchmove
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const handleTouchStart = (e: TouchEvent) => {
+      // FIRST: Mark that we're touching the canvas - must be before anything else
+      // This flag enables document-level scroll prevention
+      isTouchingCanvasRef.current = true;
+
+      // Prevent default and stop propagation immediately
+      e.preventDefault();
+      e.stopPropagation();
+
       if (completed || failed) return;
-      e.preventDefault(); // Also prevent default on start
 
       const point = getPoint(e);
       if (point) {
@@ -189,9 +271,9 @@ export function DalgonaGame() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      // CRITICAL: UNCONDITIONAL preventDefault - must be FIRST, before any logic
-      // This is how it worked in original HTML version
+      // CRITICAL: UNCONDITIONAL preventDefault - must be FIRST
       e.preventDefault();
+      e.stopPropagation();
 
       const point = getPoint(e);
       if (point) {
@@ -203,7 +285,11 @@ export function DalgonaGame() {
       }
     };
 
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (e: TouchEvent) => {
+      // Release the canvas touch lock
+      isTouchingCanvasRef.current = false;
+      e.preventDefault();
+
       setNeedlePos(prev => ({ ...prev, visible: false }));
       endDalgonaDrawing();
     };
@@ -245,6 +331,8 @@ export function DalgonaGame() {
     canvas.addEventListener('mouseleave', handleMouseUp);
 
     return () => {
+      isTouchingCanvasRef.current = false;
+
       canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleTouchEnd);
@@ -299,7 +387,11 @@ export function DalgonaGame() {
 
 
   return (
-    <div className="dalgona-screen screen-fade-in flex flex-col items-center px-5 py-6 bg-dark" ref={containerRef}>
+    <div
+      className="dalgona-screen screen-fade-in flex flex-col items-center px-5 py-6 bg-dark"
+      ref={containerRef}
+      style={{ touchAction: 'none' }}
+    >
       {/* Needle cursor */}
       {needlePos.visible && (
         <div
@@ -364,6 +456,7 @@ export function DalgonaGame() {
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
           className="dalgona-canvas rounded-full cursor-none select-none"
+          style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
         />
 
         {/* Result Overlay */}
