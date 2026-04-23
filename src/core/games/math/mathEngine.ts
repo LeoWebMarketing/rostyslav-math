@@ -1,43 +1,70 @@
 import type { MathProblem, MathStep } from '@core/types';
 
 /**
- * Generate a single math problem
- * Format: A op1 B op2 C = ?
- * Result is always between 0 and 20
+ * Generate a single math problem.
+ * 30% pure multiplication:  a × b = ?  (a,b ∈ [1..4])
+ * 70% two-action:           X ± Y×Z  or  Y×Z ± X
+ *   Y,Z ∈ [1..4], X ∈ [1..15], result ∈ [0..30]
  */
 export function generateProblem(): MathProblem {
-  const types: Array<{ ops: ['+' | '-', '+' | '-'] }> = [
-    { ops: ['+', '+'] },
-    { ops: ['+', '-'] },
-    { ops: ['-', '+'] },
-    { ops: ['-', '-'] }
-  ];
-
-  const type = types[Math.floor(Math.random() * types.length)];
-  let a: number, b: number, c: number, result: number;
   let attempts = 0;
 
   do {
-    a = Math.floor(Math.random() * 15) + 3;  // 3-17
-    b = Math.floor(Math.random() * 9) + 1;   // 1-9
-    c = Math.floor(Math.random() * 9) + 1;   // 1-9
-
-    result = a;
-    result = type.ops[0] === '+' ? result + b : result - b;
-    result = type.ops[1] === '+' ? result + c : result - c;
-
     attempts++;
-  } while ((result < 0 || result > 20 || (a - b < 0 && type.ops[0] === '-')) && attempts < 100);
 
-  return {
-    a,
-    b,
-    c,
-    op1: type.ops[0],
-    op2: type.ops[1],
-    answer: result,
-    display: `${a} ${type.ops[0]} ${b} ${type.ops[1]} ${c} = ?`
-  };
+    if (Math.random() < 0.30) {
+      // --- pure multiplication ---
+      const a = Math.floor(Math.random() * 4) + 1;  // 1-4
+      const b = Math.floor(Math.random() * 4) + 1;  // 1-4
+      return {
+        a,
+        b,
+        c: 0,
+        op1: '*',
+        op2: null,
+        answer: a * b,
+        display: `${a} × ${b} = ?`
+      };
+    }
+
+    // --- two-action: one multiplication + one +/- ---
+    const addSubOp = Math.random() < 0.5 ? '+' : '-';
+    const y = Math.floor(Math.random() * 4) + 1;  // 1-4
+    const z = Math.floor(Math.random() * 4) + 1;  // 1-4
+    const x = Math.floor(Math.random() * 15) + 1; // 1-15
+    const product = y * z;
+
+    if (Math.random() < 0.5) {
+      // form: X op Y×Z   →  a=X, op1=addSubOp, b=Y, op2='*', c=Z
+      const result = addSubOp === '+' ? x + product : x - product;
+      if (result < 0 || result > 30) continue;
+      return {
+        a: x,
+        b: y,
+        c: z,
+        op1: addSubOp,
+        op2: '*',
+        answer: result,
+        display: `${x} ${addSubOp} ${y} × ${z} = ?`
+      };
+    } else {
+      // form: Y×Z op X   →  a=Y, op1='*', b=Z, op2=addSubOp, c=X
+      const result = addSubOp === '+' ? product + x : product - x;
+      if (result < 0 || result > 30) continue;
+      return {
+        a: y,
+        b: z,
+        c: x,
+        op1: '*',
+        op2: addSubOp,
+        answer: result,
+        display: `${y} × ${z} ${addSubOp} ${x} = ?`
+      };
+    }
+  } while (attempts < 100);
+
+  // fallback: simple 2×2
+  return { a: 2, b: 2, c: 0, op1: '*', op2: null, answer: 4, display: '2 × 2 = ?' };
 }
 
 /**

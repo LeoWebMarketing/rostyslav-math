@@ -4,8 +4,8 @@ export interface MathProblem {
   a: number;
   b: number;
   c: number;
-  op1: '+' | '-';
-  op2: '+' | '-';
+  op1: '+' | '-' | '*';
+  op2: '+' | '-' | '*' | null;
   answer: number;
   display: string;
 }
