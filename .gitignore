@@ -5,3 +5,6 @@ dist/
 *.local
 .env
 react-app/
+.wrangler/
+.serena/
+.dev.vars

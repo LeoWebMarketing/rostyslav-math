@@ -1,20 +1,29 @@
 {
-  "name": "rostyslav-math",
+  "name": "klasno",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && mkdir -p dist/g2 && mv dist/legacy/index.html dist/g2/index.html",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx"
+    "test": "vitest run",
+    "test:worker": "vitest run worker/index.test.ts",
+    "lint": "eslint src --ext .ts,.tsx",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@fontsource/nunito": "^5.1.0",
+    "arctic": "^1.9.2",
+    "hono": "^4.5.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "zod": "^3.23.10",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@types/node": "^20.14.14",
     "@types/react": "^18.3.16",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
@@ -23,6 +32,8 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8",
+    "wrangler": "^4.137.0"
   }
 }

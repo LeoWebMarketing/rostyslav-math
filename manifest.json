@@ -1,26 +1,25 @@
 {
-  "name": "Squid Math - Математика Кальмара",
-  "short_name": "Squid Math",
-  "description": "Математична гра для дітей у стилі Squid Game",
+  "name": "Класно",
+  "short_name": "Класно",
+  "description": "Learning platform for Ukrainian kids",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0f0f1a",
-  "theme_color": "#FF0080",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "theme_color": "#12352A",
+  "background_color": "#12352A",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/theme/dino/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "/theme/dino/logo-mark.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
-  ],
-  "categories": ["education", "games"],
-  "lang": "uk"
+  ]
 }
