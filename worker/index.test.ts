@@ -163,7 +163,7 @@ describe('ownership, validation and progress', () => {
     expect((await json(await call('/api/review/' + profileA, 'GET', undefined, cookie))).mistakes).toEqual([{ lessonKey: 'math/l1', exerciseId: 'e1' }]);
     expect((await post(1, true)).status).toBe(200);
     const progress = await json(await call('/api/progress/' + profileA, 'GET', undefined, cookie));
-    expect(progress.lessons).toEqual([{ lessonKey: 'math/l1', bestStars: 3, bestAccuracy: 1, completions: 2 }]);
+    expect(progress.lessons).toEqual([{ lessonKey: 'math/l1', bestStars: 3, bestAccuracy: 1, completions: 2, lastAt: time.getTime() }]);
     expect(progress.todayXp).toBe(20);
     expect((await json(await call('/api/review/' + profileA, 'GET', undefined, cookie))).mistakes).toEqual([]);
   });

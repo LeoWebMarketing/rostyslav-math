@@ -190,7 +190,7 @@ export function createApp(deps: Deps = {}) {
     const id = c.req.param('profileId');
     if (!await owns(c.env.DB, c.get('user')!.id, id)) return c.json({ error: 'Not found' }, 404);
     const [progress, stats] = await Promise.all([
-      c.env.DB.prepare('SELECT lesson_key AS lessonKey, best_stars AS bestStars, best_accuracy AS bestAccuracy, completions FROM lesson_progress WHERE profile_id = ? ORDER BY lesson_key').bind(id).all(),
+      c.env.DB.prepare('SELECT lesson_key AS lessonKey, best_stars AS bestStars, best_accuracy AS bestAccuracy, completions, last_at AS lastAt FROM lesson_progress WHERE profile_id = ? ORDER BY lesson_key').bind(id).all(),
       c.env.DB.prepare('SELECT day, xp FROM daily_stats WHERE profile_id = ? AND xp > 0 ORDER BY day DESC').bind(id).all<{ day: string; xp: number }>(),
     ]);
     const today = kyivDay(now()); const days = new Set(stats.results.map(row => row.day));

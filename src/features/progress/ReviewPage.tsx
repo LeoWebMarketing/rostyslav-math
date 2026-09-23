@@ -30,7 +30,7 @@ export function ReviewPage() {
         <Mascot pose="sleep" size={120} className="empty-mascot" eager />
         <h1>Помилок поки немає!</h1>
         <p>Пройди урок, а складні вправи з’являться тут.</p>
-        <Link className="action-button" to="/">До уроків</Link>
+        <Link className="action-button" to="/klasy">До уроків</Link>
       </div>
     </Shell>
   );
@@ -39,7 +39,7 @@ export function ReviewPage() {
       key={exercises.map(exercise => exercise.id).join('|')}
       lesson={{ id: 'review', title: 'Робота над помилками', exercises }}
       lessonKey="review/recent/all/review"
-      back="/"
+      back="/klasy"
       review
     />
   );

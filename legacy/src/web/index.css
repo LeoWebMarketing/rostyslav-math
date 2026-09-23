@@ -43,6 +43,77 @@ body {
   touch-action: manipulation;
 }
 
+.legacy-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.legacy-header {
+  position: sticky;
+  top: 0;
+  z-index: 101;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: calc(48px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 12px 0;
+  background: var(--darker);
+  border-bottom: 1px solid var(--gray);
+}
+
+.legacy-back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  color: var(--pink);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.legacy-back-link:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.legacy-grade-label {
+  color: var(--white);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.legacy-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.legacy-content > * {
+  flex-shrink: 0;
+}
+
+.legacy-content > .min-h-screen,
+.legacy-content > .dalgona-screen {
+  min-height: 100%;
+}
+
+.legacy-content > .dalgona-screen {
+  overflow: visible;
+}
+
 /* Hide number input spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {

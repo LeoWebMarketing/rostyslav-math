@@ -1,6 +1,6 @@
 export type Profile = { id: string; name: string; avatar: string; grade: number };
 export type User = { id: string; name: string; email: string; avatarUrl: string };
-export type LessonProgress = { lessonKey: string; bestStars: number; bestAccuracy: number; completions: number };
+export type LessonProgress = { lessonKey: string; bestStars: number; bestAccuracy: number; completions: number; lastAt?: number };
 export type ProgressResponse = { lessons: LessonProgress[]; streak: number; todayXp: number };
 export type ApiAttempt = { exerciseId: string; correct: boolean; answer: string };
 

@@ -39,7 +39,7 @@ export function ProfilesPage() {
         <h1>Увійди як дорослий</h1>
         <p>Без входу уроки та прогрес доступні в гостьовому режимі.</p>
         {authAvailable && <a className="action-button" href="/api/auth/google">Увійти через Google</a>}
-        <Link className="action-button secondary" to="/">Навчатися як гість</Link>
+        <Link className="action-button secondary" to="/klasy">Навчатися як гість</Link>
       </div>
       <LegalLinks />
     </Shell>

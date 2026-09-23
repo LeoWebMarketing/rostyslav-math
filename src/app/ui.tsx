@@ -65,13 +65,15 @@ export function Shell({ children, title, back = '/', contentClassName = '' }: { 
     <header className="site-header">
       {pathname !== '/' && <Link className="back-link" to={back} aria-label="Назад">←</Link>}
       {title === 'Класно' ? (
-        <div className="header-brand">
+        <Link className="header-brand" to="/" aria-label="Класно — головна">
           <Art file="/theme/dino/logo-mark.webp" fallback="🦖" className="header-mark" width={40} height={40} eager />
           <strong>Класно</strong>
-        </div>
+        </Link>
       ) : (
         <>
-          <Art file="/theme/dino/logo-mark.webp" fallback="🦖" className="header-mark" width={40} height={40} eager />
+          <Link to="/" aria-label="Класно — головна" className="header-mark-link">
+            <Art file="/theme/dino/logo-mark.webp" fallback="🦖" className="header-mark" width={40} height={40} eager />
+          </Link>
           <strong>{title ?? 'Класно'}</strong>
         </>
       )}

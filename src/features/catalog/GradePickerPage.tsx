@@ -7,7 +7,6 @@ import { LegalLinks } from '../legal/LegalPages';
 import { useProgress } from '../progress/store';
 
 export function GradePickerPage() {
-  const query = new URLSearchParams(window.location.search);
   const { guest, user, activeProfileId } = useProgress();
   const [hasReviewMistakes, setHasReviewMistakes] = useState(false);
   useEffect(() => {
@@ -22,7 +21,6 @@ export function GradePickerPage() {
       .catch(() => { if (current) setHasReviewMistakes(guest.mistakes.length > 0); });
     return () => { current = false; };
   }, [guest.mistakes, user, activeProfileId]);
-  if (query.has('game')) { window.location.replace(`/g2/?${query.toString()}`); return null; }
   const grades = [...new Set(contentRegistry.map(section => section.grade))].sort();
   return <Shell title="Класно" contentClassName="grade-picker-page">
     <div className="grade-picker-main">

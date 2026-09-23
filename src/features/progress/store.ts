@@ -6,7 +6,7 @@ export const GUEST_KEY = 'klasno.guest.v1';
 const PROFILE_KEY = 'klasno.profile.v1';
 const IMPORT_KEY = 'klasno.imported.v1';
 export type GuestData = {
-  lessons: Record<string, { bestStars: number; bestAccuracy: number; completions: number }>;
+  lessons: Record<string, { bestStars: number; bestAccuracy: number; completions: number; lastAt?: number }>;
   days: Record<string, number>;
   mistakes: string[];
 };
@@ -86,6 +86,7 @@ export const useProgress = create<ProgressState>((set, get) => ({
           bestStars: Math.max(prior?.bestStars ?? 0, stars),
           bestAccuracy: Math.max(prior?.bestAccuracy ?? 0, accuracy),
           completions: (prior?.completions ?? 0) + 1,
+          lastAt: Date.now(),
         },
       },
       days: { ...guest.days, [kyivDay()]: (guest.days[kyivDay()] ?? 0) + xp },

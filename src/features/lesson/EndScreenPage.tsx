@@ -7,7 +7,7 @@ export function EndScreenPage() {
   if (!result) return (
     <div className="jungle-page end-page">
       <h1>Спершу пройди урок</h1>
-      <Link className="action-button" to="/">Обрати клас</Link>
+      <Link className="action-button" to="/klasy">Обрати клас</Link>
     </div>
   );
   const [grade, subject, section, lesson] = result.lessonKey.split('/');
@@ -31,7 +31,7 @@ export function EndScreenPage() {
         {next && !result.review && (
           <Link className="action-button" to={`/g/${grade}/${subject}/${next.section}/${next.lesson.id}`}>Далі</Link>
         )}
-        <Link className="action-button secondary" to={result.review ? '/' : `/g/${grade}/${subject}`}>До карти</Link>
+        <Link className="action-button secondary" to={result.review ? '/klasy' : `/g/${grade}/${subject}`}>До карти</Link>
       </div>
     </div>
   );

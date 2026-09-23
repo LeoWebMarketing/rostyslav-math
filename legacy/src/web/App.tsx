@@ -21,6 +21,12 @@ import {
 export function App() {
   const { screen, startDalgona, startRedLight, startMathGame, startGlassBridge, startTugOfWar, startMarbles, startZuma } = useGameStore();
 
+  const handleBack = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (screen !== 'start' && !screen.endsWith('Result') && !window.confirm('Вийти з гри?')) {
+      event.preventDefault();
+    }
+  };
+
   // Secret URL params for direct game access
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -81,8 +87,14 @@ export function App() {
   };
 
   return (
-    <div className="h-screen h-[100dvh] bg-dark text-white overflow-clip">
-      {renderScreen()}
+    <div className="legacy-shell bg-dark text-white">
+      <header className="legacy-header">
+        <a className="legacy-back-link" href="/klasy" onClick={handleBack}>← Класно</a>
+        <span className="legacy-grade-label">2 клас · Математика</span>
+      </header>
+      <main className="legacy-content">
+        {renderScreen()}
+      </main>
     </div>
   );
 }
