@@ -191,3 +191,13 @@ one, dance at lesson end, sleeps after inactivity, tap to make him wave/giggle).
   model fits. License must be CC0/CC-BY and recorded in `public/theme/dino/3d/LICENSE.md`.
 - Events: the lesson engine emits `correct | wrong | lessonEnd | idle` to a small mascot bus; the 2D and
   3D mascots both subscribe, so the engine never depends on 3D.
+
+## 14. Commercial direction (Roman, 2026-09-23) - pending LWM PM strategy decision
+Positioning: **what pupils open themselves** - "Duolingo for your class". Not a teacher lesson-prep
+library (На Урок, Всеосвіта). Direct competitors: Quizizz/Wayground, Kahoot, Blooket, Wordwall.
+Users = pupils (engagement: Дино, stars, streaks, 3D mascot, runner game, class goals).
+Author + payer = teacher (300-350 UAH/month target; goal >= 100k UAH MRR ~ 290-330 teachers).
+Teacher value: create exercises in a minute from photo + voice in a chat and edit by voice; class code
+for pupils; class dashboard "who did what, where the mistakes are".
+Validation first: 4-week test with Oksana + 5-10 teachers, kill gate: < 5 weekly-active teachers for
+3 consecutive weeks OR < 3 pre-payments >= 150 UAH.
