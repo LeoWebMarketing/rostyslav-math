@@ -14,7 +14,7 @@ export function SubjectPickerPage() {
     section => section.grade === Number(grade) && section.subject === subject.id,
   ));
   return (
-    <Shell title={`${grade} клас`}>
+    <Shell title={`${grade} клас`} contentClassName="subject-picker-page">
       <h1>Обери предмет</h1>
       <div className="card-grid">{available.map(subject => (
         <Link className={`subject-card subject-${subject.id}`} key={subject.id} to={`/g/${grade}/${subject.id}`}>

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { guestStats, useProgress } from '../features/progress/store';
 
 type ArtProps = {
@@ -56,23 +56,19 @@ export function Mascot({
   );
 }
 
-export function Shell({ children, title, back = '/' }: { children: ReactNode; title?: string; back?: string }) {
+export function Shell({ children, title, back = '/', contentClassName = '' }: { children: ReactNode; title?: string; back?: string; contentClassName?: string }) {
+  const { pathname } = useLocation();
   const { user, activeProfileId, profiles, guest, streak, todayXp, authAvailable } = useProgress();
   const stats = user ? { streak, todayXp } : guestStats(guest);
   const active = profiles.find(profile => profile.id === activeProfileId);
   return <div className="jungle-page">
     <header className="site-header">
-      <Link className="back-link" to={back} aria-label="Назад">←</Link>
+      {pathname !== '/' && <Link className="back-link" to={back} aria-label="Назад">←</Link>}
       {title === 'Класно' ? (
-        <Art
-          file="/theme/dino/logo-wordmark.webp"
-          fallback="Класно"
-          className="header-wordmark"
-          alt="Класно"
-          width={150}
-          height={48}
-          eager
-        />
+        <div className="header-brand">
+          <Art file="/theme/dino/logo-mark.webp" fallback="🦖" className="header-mark" width={40} height={40} eager />
+          <strong>Класно</strong>
+        </div>
       ) : (
         <>
           <Art file="/theme/dino/logo-mark.webp" fallback="🦖" className="header-mark" width={40} height={40} eager />
@@ -84,11 +80,17 @@ export function Shell({ children, title, back = '/' }: { children: ReactNode; ti
         <span aria-label={`${stats.todayXp} досвіду сьогодні`}>⭐ {stats.todayXp}</span>
       </div>
       {user ? (
-        <Link className="profile-link" to="/profiles">{active ? `${active.avatar} ${active.name}` : 'Профілі'}</Link>
+        <Link className="profile-link" to="/profiles" aria-label="Профілі">
+          <span className="profile-icon" aria-hidden="true">{active?.avatar ?? '👤'}</span>
+          <span className="profile-label">{active?.name ?? 'Профілі'}</span>
+        </Link>
       ) : authAvailable ? (
-        <a className="profile-link" href="/api/auth/google">Увійти</a>
+        <a className="profile-link" href="/api/auth/google" aria-label="Увійти">
+          <span className="profile-icon" aria-hidden="true">↪</span>
+          <span className="profile-label">Увійти</span>
+        </a>
       ) : null}
     </header>
-    <main className="page-content">{children}</main>
+    <main className={`page-content ${contentClassName}`}>{children}</main>
   </div>;
 }

@@ -36,7 +36,7 @@ export function SectionMapPage() {
             className={`lesson-node ${unlocked ? 'unlocked' : 'locked'}`}
             to={`/g/${key}`}
           >
-            <Art file={nodeArt} fallback={unlocked ? stars ? '🐣' : '🥚' : '🔒'} className="node-art" width={72} height={72} />
+            <Art file={nodeArt} fallback={unlocked ? stars ? '🐣' : '🥚' : '🔒'} className="node-art" width={88} height={88} />
           </Link>
           <strong>{lesson.title}</strong>
           <span className="stars" aria-label={`${stars} зірок`}>{stars ? '⭐'.repeat(stars) : unlocked ? 'Почати' : 'Закрито'}</span>
