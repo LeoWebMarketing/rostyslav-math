@@ -21,7 +21,7 @@ export function SectionMapPage() {
         <div className="lesson-path">{section.lessons.map(lesson => {
       const key = `${grade}/${subject}/${section.section}/${lesson.id}`;
       const stars = progress(key);
-      const unlocked = !previous || progress(previous) >= 1
+      const unlocked = !previous || section.section === 'test-prep' || progress(previous) >= 1
         || (section.section !== 'test-prep' && previous.includes('/test-prep/'));
       previous = key;
       const offset = (index++ % 3) - 1;
