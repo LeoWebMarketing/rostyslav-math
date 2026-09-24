@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { contentRegistry } from '../../../content';
 import type { Exercise, Lesson } from '../../../content/schema';
-import { checkExercise, continueLesson, isAnswerReady, lessonResult, startLesson, submitAnswer, submitWrongPair } from './engine';
+import { checkExercise, continueLearn, continueLesson, isAnswerReady, lessonResult, startLesson, submitAnswer, submitWrongPair } from './engine';
 
 const samples: { exercise: Exercise; right: string | string[] | number[]; wrong: string | string[] | number[] }[] = [
   { exercise: { id: 'c', type: 'choice', prompt: 'Обери', options: ['а', 'б'], answer: 'а', speak: false }, right: 'а', wrong: 'б' },
@@ -48,6 +48,30 @@ describe('lesson engine', () => {
     expect(state.phase).toBe('complete');
     expect(lessonResult(state).accuracy).toBe(0);
   });
+  it('keeps learn cards first, unscored, and out of the retry and mistake attempts', () => {
+    const cards: Exercise[] = [
+      { id: 'learn-1', type: 'learn', title: 'Правило', rows: [['can', 'вмію']] },
+      { id: 'learn-2', type: 'learn', title: 'Слова', rows: [['sing', 'співати']] },
+    ];
+    const lesson: Lesson = { id: 'learn-test', title: 'Вчимося', exercises: [...cards, samples[0].exercise] };
+    let state = startLesson(lesson, () => 0);
+    expect(state.queue.map(item => item.id)).toEqual(['learn-1', 'learn-2', 'c']);
+    expect(state.total).toBe(1);
+    expect(isAnswerReady(cards[0], 'anything')).toBe(false);
+    expect(submitAnswer(state, 'anything')).toBe(state);
+    expect(continueLesson(state)).toBe(state);
+    state = continueLearn(state);
+    state = continueLearn(state);
+    expect(state.queue.map(item => item.id)).toEqual(['c']);
+    expect(state.attempts).toEqual([]);
+    expect(state.solved).toEqual([]);
+    state = continueLesson(submitAnswer(state, 'а'));
+    expect(state.phase).toBe('complete');
+    expect(state.attempts).toEqual([{ exerciseId: 'c', correct: true, answer: 'а' }]);
+    expect(lessonResult(state)).toEqual({ accuracy: 1, stars: 3, xp: 12 });
+    const learnOnly = startLesson({ id: 'only', title: 'Картка', exercises: [cards[0]] });
+    expect(lessonResult(continueLearn(learnOnly))).toEqual({ accuracy: 0, stars: 0, xp: 0 });
+  });
   it('accepts identical right-hand labels in either matching position', () => {
     const exercise: Exercise = { id: 'duplicate', type: 'match', pairs: [['а', 'голосний'], ['м', 'приголосний'], ['и', 'голосний']] };
     expect(checkExercise(exercise, [2, 1, 0])).toBe(true);
@@ -73,7 +97,7 @@ describe('lesson engine', () => {
   it('plays a real lesson through to completion after a retry', () => {
     const lesson = contentRegistry.find(section => section.subject === 'math')!.lessons[0];
     let state = startLesson(lesson, () => 0.99);
-    const answerFor = (exercise: Exercise) => exercise.type === 'match'
+    const answerFor = (exercise: Exercise) => exercise.type === 'learn' ? '' : exercise.type === 'match'
       ? exercise.pairs.map((_, i) => i)
       : exercise.type === 'order' ? exercise.answer : String(exercise.answer);
     state = continueLesson(submitAnswer(state, 'неправильно'));

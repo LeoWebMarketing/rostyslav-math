@@ -4,6 +4,15 @@ const BaseExercise = z.object({
   id: z.string(),
   type: z.string(),
   hint: z.string().optional(),
+  explain: z.string().min(1).max(160).optional(),
+});
+
+const LearnExercise = z.object({
+  id: z.string(),
+  type: z.literal('learn'),
+  title: z.string().min(1),
+  rows: z.array(z.tuple([z.string().min(1), z.string().min(1)])).min(1),
+  note: z.string().optional(),
 });
 
 const ChoiceExercise = BaseExercise.extend({
@@ -58,6 +67,7 @@ const MathExercise = BaseExercise.extend({
 });
 
 export const Exercise = z.union([
+  LearnExercise,
   ChoiceExercise,
   MatchExercise,
   TypeExercise,

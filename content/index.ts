@@ -18,7 +18,10 @@ for (const [path, module] of Object.entries(modules)) {
 }
 
 const subjectOrder: Record<string, number> = { math: 0, ukrainian: 1, english: 2 };
-sections.sort((a, b) => a.grade - b.grade || (subjectOrder[a.subject] ?? 99) - (subjectOrder[b.subject] ?? 99) || a.section.localeCompare(b.section));
+sections.sort((a, b) => a.grade - b.grade
+  || (subjectOrder[a.subject] ?? 99) - (subjectOrder[b.subject] ?? 99)
+  || (a.grade === 3 && a.subject === 'english' ? Number(b.section === 'test-prep') - Number(a.section === 'test-prep') : 0)
+  || a.section.localeCompare(b.section));
 
 const ids = new Set<string>();
 for (const section of sections) {

@@ -49,4 +49,12 @@ describe('home routing', () => {
       { lessonKey: englishFirst, completions: 1, lastAt: 200 },
     ])).toBe(`/g/${englishNext}`);
   });
+
+  it('opens test preparation for a fresh English guest', () => {
+    const map = render('/g/3/english');
+    expect(map.indexOf('Підготовка до контрольної')).toBeLessThan(map.indexOf('Я вмію!'));
+    expect(map).toContain('href="/g/3/english/test-prep/g3-en-tp-l1"');
+    expect(map).toMatch(/class="lesson-node unlocked" href="\/g\/3\/english\/test-prep\/g3-en-tp-l1"/);
+    expect(map).toMatch(/class="lesson-node unlocked" href="\/g\/3\/english\/can-activities\/g3-en-can-activities-l1"/);
+  });
 });

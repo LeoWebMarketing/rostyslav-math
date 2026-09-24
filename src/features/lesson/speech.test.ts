@@ -27,7 +27,7 @@ describe('English speech text', () => {
     expect(exercises.length).toBeGreaterThan(0);
     for (const exercise of exercises) {
       const speech = promptSpeechText(exercise);
-      if (!speech || exercise.type === 'match' || exercise.type === 'math') continue;
+      if (!speech || exercise.type === 'learn' || exercise.type === 'match' || exercise.type === 'math') continue;
       const answer = exercise.type === 'order' ? exercise.answer.join(' ') : exercise.answer;
       expect(speech.toLowerCase(), exercise.id).not.toContain(answer.toLowerCase());
     }

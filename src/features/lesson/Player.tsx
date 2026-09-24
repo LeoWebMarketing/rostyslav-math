@@ -1,13 +1,43 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Lesson } from '../../../content/schema';
+import type { Exercise, Lesson } from '../../../content/schema';
 import { Mascot } from '../../app/ui';
 import { useProgress } from '../progress/store';
 import {
-  correctAnswer, continueLesson, isAnswerReady, lessonResult, startLesson, submitAnswer, submitWrongPair, type Answer,
+  correctAnswer, continueLearn, continueLesson, isAnswerReady, lessonResult, startLesson, submitAnswer, submitWrongPair, type Answer,
 } from './engine';
 import { ExerciseView } from './ExerciseView';
 import { feedbackSpeechText, speakEnglish, useEnglishVoice } from './speech';
+
+type ScoredExercise = Exclude<Exercise, { type: 'learn' }>;
+
+export function FeedbackSheet({ exercise, correct, onContinue, voice }: {
+  exercise: ScoredExercise; correct: boolean; onContinue: () => void; voice: SpeechSynthesisVoice | null;
+}) {
+  const feedbackSpeech = feedbackSpeechText(exercise);
+  return (
+    <div className={`feedback-sheet ${correct ? 'correct' : 'wrong'}`} role="status">
+      <div className="feedback-copy">
+        <Mascot pose={correct ? 'cheer' : 'oops'} size={70} className="feedback-mascot" eager />
+        <div className="feedback-details">
+          <strong>{correct ? 'Правильно! Молодець!' : 'Поки що не вийшло. Спробуємо ще!'}</strong>
+          {!correct && <p className="correct-answer"><span>Правильна відповідь:</span> <b>{correctAnswer(exercise)}</b></p>}
+          {'explain' in exercise && exercise.explain && (
+            <p className={correct ? 'feedback-explain compact' : 'feedback-explain'}>
+              <span>Чому так:</span> {exercise.explain}
+            </p>
+          )}
+          {feedbackSpeech && typeof window !== 'undefined' && 'speechSynthesis' in window && (
+            <button className="speak-button feedback-speak" type="button"
+              onClick={() => speakEnglish(feedbackSpeech, voice)}
+              aria-label="Прослухати правильну відповідь англійською">🔊</button>
+          )}
+        </div>
+      </div>
+      <button className="action-button" type="button" onClick={onContinue}>Продовжити</button>
+    </div>
+  );
+}
 
 export function Player({ lesson, lessonKey, back, review = false }: { lesson: Lesson; lessonKey: string; back: string; review?: boolean }) {
   const navigate = useNavigate();
@@ -43,6 +73,7 @@ export function Player({ lesson, lessonKey, back, review = false }: { lesson: Le
   if (!exercise) return <div className="lesson-page">Завершуємо урок…</div>;
   const onClose = () => { if (window.confirm('Вийти з уроку? Незавершений урок не збережеться.')) navigate(back); };
   const onContinue = () => { setState(current => continueLesson(current)); setAnswer(''); };
+  const onLearn = () => { setState(current => continueLearn(current)); setAnswer(''); };
   const onCheck = () => {
     const next = submitAnswer(state, answer); setState(next);
     if (!next.lastCorrect && typeof navigator.vibrate === 'function') navigator.vibrate(100);
@@ -51,8 +82,7 @@ export function Player({ lesson, lessonKey, back, review = false }: { lesson: Le
     setState(current => submitWrongPair(current, left, right));
     if (typeof navigator.vibrate === 'function') navigator.vibrate(100);
   };
-  const progress = Math.round(state.solved.length / state.total * 100);
-  const feedbackSpeech = feedbackSpeechText(exercise);
+  const progress = state.total ? Math.round(state.solved.length / state.total * 100) : 0;
   return (
     <div className="lesson-page">
       <header className="lesson-top">
@@ -80,30 +110,17 @@ export function Player({ lesson, lessonKey, back, review = false }: { lesson: Le
           disabled={state.phase !== 'answer'}
         />
       </main>
-      {state.phase === 'feedback' ? (
-        <div className={`feedback-sheet ${state.lastCorrect ? 'correct' : 'wrong'}`} role="status">
-          <div className="feedback-copy">
-            <Mascot pose={state.lastCorrect ? 'cheer' : 'oops'} size={70} className="feedback-mascot" eager />
-            <div>
-              <strong>{state.lastCorrect ? 'Правильно! Молодець!' : 'Поки що не вийшло. Спробуємо ще!'}</strong>
-              <p>Правильна відповідь: {correctAnswer(exercise)}</p>
-              {feedbackSpeech && typeof window !== 'undefined' && 'speechSynthesis' in window && (
-                <button
-                  className="speak-button feedback-speak"
-                  type="button"
-                  onClick={() => speakEnglish(feedbackSpeech, voice)}
-                  aria-label="Прослухати правильну відповідь англійською"
-                >🔊</button>
-              )}
-            </div>
-          </div>
-          <button className="action-button" type="button" onClick={onContinue}>Продовжити</button>
-        </div>
+      {state.phase === 'feedback' && exercise.type !== 'learn' ? (
+        <FeedbackSheet exercise={exercise} correct={state.lastCorrect === true} onContinue={onContinue} voice={voice} />
       ) : (
         <footer className="lesson-footer">
-          <button className="action-button" type="button" disabled={!isAnswerReady(exercise, answer)} onClick={onCheck}>
-            Перевірити
-          </button>
+          {exercise.type === 'learn' ? (
+            <button className="action-button" type="button" onClick={onLearn}>Зрозуміло!</button>
+          ) : (
+            <button className="action-button" type="button" disabled={!isAnswerReady(exercise, answer)} onClick={onCheck}>
+              Перевірити
+            </button>
+          )}
         </footer>
       )}
     </div>

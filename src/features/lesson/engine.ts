@@ -24,9 +24,11 @@ export function shuffle<T>(items: T[], random: () => number = Math.random): T[] 
 }
 
 export function startLesson(lesson: Lesson, random: () => number = Math.random): LessonState {
+  const learn = lesson.exercises.filter(exercise => exercise.type === 'learn');
+  const scored = lesson.exercises.filter(exercise => exercise.type !== 'learn');
   return {
-    queue: shuffle(lesson.exercises, random),
-    total: lesson.exercises.length,
+    queue: [...learn, ...shuffle(scored, random)],
+    total: scored.length,
     solved: [],
     firstTryCorrect: 0,
     attempted: [],
@@ -37,6 +39,7 @@ export function startLesson(lesson: Lesson, random: () => number = Math.random):
 }
 
 export function isAnswerReady(exercise: Exercise, answer: Answer): boolean {
+  if (exercise.type === 'learn') return false;
   if (exercise.type === 'match') return Array.isArray(answer)
     && answer.length === exercise.pairs.length
     && answer.every(value => typeof value === 'number' && value >= 0);
@@ -63,7 +66,7 @@ export function checkExercise(exercise: Exercise, answer: Answer): boolean {
 }
 
 export function submitAnswer(state: LessonState, answer: Answer): LessonState {
-  if (state.phase !== 'answer' || !state.queue.length || !isAnswerReady(state.queue[0], answer)) return state;
+  if (state.phase !== 'answer' || !state.queue.length || state.queue[0].type === 'learn' || !isAnswerReady(state.queue[0], answer)) return state;
   const exercise = state.queue[0];
   const correct = checkExercise(exercise, answer);
   return {
@@ -93,12 +96,20 @@ export function continueLesson(state: LessonState): LessonState {
   return { ...state, queue, solved, phase: queue.length ? 'answer' : 'complete', lastCorrect: null };
 }
 
+export function continueLearn(state: LessonState): LessonState {
+  if (state.phase !== 'answer' || state.queue[0]?.type !== 'learn') return state;
+  const queue = state.queue.slice(1);
+  return { ...state, queue, phase: queue.length ? 'answer' : 'complete' };
+}
+
 export function lessonResult(state: LessonState) {
   const accuracy = state.total ? state.firstTryCorrect / state.total : 0;
-  return { accuracy, stars: accuracy >= 0.9 ? 3 : accuracy >= 0.7 ? 2 : 1, xp: 10 + 2 * state.firstTryCorrect };
+  return { accuracy, stars: state.total ? accuracy >= 0.9 ? 3 : accuracy >= 0.7 ? 2 : 1 : 0,
+    xp: state.total ? 10 + 2 * state.firstTryCorrect : 0 };
 }
 
 export function correctAnswer(exercise: Exercise): string {
+  if (exercise.type === 'learn') return '';
   if (exercise.type === 'match') return exercise.pairs.map(([left, right]) => `${left} — ${right}`).join(', ');
   if (exercise.type === 'order') return exercise.answer.join(' ');
   return String(exercise.answer);

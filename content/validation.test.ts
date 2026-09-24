@@ -54,7 +54,7 @@ describe('content schema validation', () => {
   });
 
   it('validates exercise types', () => {
-    const validTypes = ['choice', 'match', 'type', 'order', 'fill', 'math'];
+    const validTypes = ['choice', 'match', 'type', 'order', 'fill', 'math', 'learn'];
     
     contentRegistry.forEach(section => {
       section.lessons.forEach(lesson => {
@@ -63,5 +63,33 @@ describe('content schema validation', () => {
         });
       });
     });
+  });
+
+  it('places the complete English test review first with playable lesson content', () => {
+    const english = contentRegistry.filter(section => section.grade === 3 && section.subject === 'english');
+    expect(english[0].id).toBe('g3-english-test-prep');
+    expect(english[0].lessons.map(lesson => lesson.exercises.length)).toEqual([14, 14, 13, 14, 15]);
+    english[0].lessons.forEach((lesson, lessonIndex) => {
+      expect(lesson.exercises.filter(exercise => exercise.type === 'learn')).toHaveLength(lessonIndex < 4 ? 2 : 0);
+      if (lessonIndex < 4) expect(lesson.exercises.slice(0, 2).map(exercise => exercise.type)).toEqual(['learn', 'learn']);
+      expect(new Set(lesson.exercises.map(exercise => exercise.type)).size).toBeGreaterThanOrEqual(4);
+      lesson.exercises.forEach((exercise, exerciseIndex) => {
+        expect(Exercise.safeParse(exercise).success).toBe(true);
+        expect(exercise.id).toBe(`g3-en-tp-l${lessonIndex + 1}-e${String(exerciseIndex + 1).padStart(2, '0')}`);
+        if (exercise.type !== 'learn') {
+          expect(exercise.explain, exercise.id).toBeTruthy();
+          expect(exercise.explain!.length, exercise.id).toBeLessThanOrEqual(160);
+        }
+        if (exercise.type === 'choice') {
+          expect(new Set(exercise.options).size).toBe(exercise.options.length);
+          expect(exercise.options.filter(option => option === exercise.answer)).toHaveLength(1);
+        }
+      });
+    });
+  });
+
+  it('rejects explanations longer than 160 characters', () => {
+    const example = { id: 'limit', type: 'math', problem: '1 + 1', answer: 2, explain: 'а'.repeat(161) };
+    expect(Exercise.safeParse(example).success).toBe(false);
   });
 });

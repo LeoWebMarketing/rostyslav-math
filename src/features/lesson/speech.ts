@@ -8,7 +8,7 @@ export function extractLatinSegments(text: string): string[] {
 }
 
 export function promptSpeechText(exercise: Exercise): string | null {
-  if (exercise.type === 'match' || exercise.type === 'math') return null;
+  if (exercise.type === 'learn' || exercise.type === 'match' || exercise.type === 'math') return null;
   const text = extractLatinSegments(exercise.prompt).join('. ');
   const answer = exercise.type === 'order' ? exercise.answer.join(' ') : exercise.answer;
   if (!text || text.toLowerCase().includes(answer.toLowerCase())) return null;
@@ -16,7 +16,7 @@ export function promptSpeechText(exercise: Exercise): string | null {
 }
 
 export function feedbackSpeechText(exercise: Exercise): string | null {
-  if (exercise.type === 'math') return null;
+  if (exercise.type === 'learn' || exercise.type === 'math') return null;
   if (exercise.type === 'match') {
     const words = exercise.pairs.flatMap(pair => pair
       .filter(text => /^[A-Za-z]/.test(text.trim()))

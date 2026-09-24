@@ -564,6 +564,65 @@ a {
   width: 100%;
 }
 
+.learn-card {
+  width: 100%;
+  padding: clamp(16px, 4vw, 28px);
+  border: 2px solid var(--sand-300);
+  border-radius: 24px;
+  background: #fffdf8;
+  overflow-wrap: anywhere;
+}
+
+.learn-kicker {
+  color: var(--jungle-700);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.learn-card h1 {
+  margin: 8px 0 20px;
+  font-size: clamp(25px, 5vw, 32px);
+}
+
+.learn-rows {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.learn-row th,
+.learn-row td {
+  width: 50%;
+  padding: 10px 12px;
+  background: var(--sand-100);
+  font-size: 18px;
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.learn-row th { border-radius: 14px 0 0 14px; }
+.learn-row td { border-radius: 0 14px 14px 0; }
+
+.learn-english {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.learn-english span { min-width: 0; }
+.learn-note { margin: 18px 0 0; font-size: 18px; line-height: 1.45; }
+
+@media (max-width: 480px) {
+  .learn-rows, .learn-rows tbody, .learn-row, .learn-row th, .learn-row td { display: block; width: 100%; }
+  .learn-row { margin-bottom: 10px; border-radius: 14px; overflow: hidden; }
+  .learn-row th, .learn-row td { border-radius: 0; }
+  .learn-row td { padding-top: 0; }
+}
+
 .prompt-row {
   display: flex;
   align-items: flex-start;
@@ -774,6 +833,8 @@ a {
 .feedback-sheet {
   border-radius: 24px 24px 0 0;
   animation: sheet-up .25s ease-out;
+  max-height: 85dvh;
+  overflow-y: auto;
 }
 
 .feedback-sheet.correct {
@@ -800,6 +861,24 @@ a {
   margin: 4px 0 0;
   font-size: 17px;
 }
+
+.feedback-details { min-width: 0; overflow-wrap: anywhere; }
+
+.feedback-copy .correct-answer {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--leaf-300);
+  color: var(--jungle-900);
+  font-size: 21px;
+  line-height: 1.35;
+}
+
+.correct-answer span { display: block; font-size: 17px; font-weight: 700; }
+.correct-answer b { font-weight: 800; }
+.feedback-copy .feedback-explain { margin-top: 10px; font-size: 18px; line-height: 1.4; }
+.feedback-copy .feedback-explain.compact { font-size: 16px; }
+.feedback-explain span { font-weight: 800; }
 
 .feedback-mascot {
   width: 70px;

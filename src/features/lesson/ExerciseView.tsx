@@ -32,10 +32,31 @@ export function ExerciseView({ exercise, answer, onAnswer, onWrongPair, disabled
   );
   const prompt = exercise.type === 'math'
     ? exercise.problem
+    : exercise.type === 'learn' ? exercise.title
     : exercise.type === 'match' ? 'З’єднай пари' : exercise.type === 'fill' ? 'Заповни пропуск' : exercise.prompt;
   const promptSpeech = promptSpeechText(exercise);
   const speechAvailable = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const speak = (text: string) => speakEnglish(text, voice);
+
+  if (exercise.type === 'learn') return (
+    <article className="learn-card" aria-labelledby={`learn-${exercise.id}`}>
+      <span className="learn-kicker">Вивчаємо</span>
+      <h1 id={`learn-${exercise.id}`}>{exercise.title}</h1>
+      <table className="learn-rows"><tbody>
+        {exercise.rows.map(([english, ukrainian], index) => (
+          <tr className="learn-row" key={`${exercise.id}-${index}`}>
+            <th scope="row"><div className="learn-english">
+              <span lang="en">{english}</span>
+              <button className="speak-button" type="button" onClick={() => speak(english)}
+                aria-label={`Прослухати англійською: ${english}`}>🔊</button>
+            </div></th>
+            <td>{ukrainian}</td>
+          </tr>
+        ))}
+      </tbody></table>
+      {exercise.note && <p className="learn-note">{exercise.note}</p>}
+    </article>
+  );
 
   const choice = (value: string, emoji?: string) => (
     <div className="option-row" key={value}>
