@@ -12,6 +12,7 @@ import { useProgress } from '../features/progress/store';
 const LessonPage = lazy(() => import('../features/lesson/LessonPage').then(module => ({ default: module.LessonPage })));
 const EndScreenPage = lazy(() => import('../features/lesson/EndScreenPage').then(module => ({ default: module.EndScreenPage })));
 const ReviewPage = lazy(() => import('../features/progress/ReviewPage').then(module => ({ default: module.ReviewPage })));
+const GamePage = lazy(() => import('../features/game/GamePage').then(module => ({ default: module.GamePage })));
 
 export function Pages() {
   const initialize = useProgress(state => state.initialize);
@@ -24,6 +25,7 @@ export function Pages() {
     <Route path="/g/:grade/:subject/:section/:lesson" element={<LessonPage />} />
     <Route path="/lesson-end" element={<EndScreenPage />} />
     <Route path="/review" element={<ReviewPage />} />
+    <Route path="/game" element={<GamePage />} />
     <Route path="/profiles" element={<ProfilesPage />} />
     <Route path="/privacy" element={<PrivacyPage />} />
     <Route path="/terms" element={<TermsPage />} />

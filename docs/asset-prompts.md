@@ -29,3 +29,30 @@ Shared style block (prepend to every prompt):
 | 18 | `node-locked.png` | 512x512 | transparent | Same egg greyed with a small vine lock. |
 | 19 | `runner-kid.png` | 1024x1024 | transparent | (Phase 2 preview) side view of a kid explorer running, hat and backpack, gender-neutral. |
 | 20 | `runner-dino.png` | 1024x1024 | transparent | (Phase 2 preview) side view of a big goofy friendly T-rex running, tongue out, playful not scary. |
+
+## Game art
+
+Prepend the shared style block above to every prompt in this table. Use the existing mascot illustrations as the visual reference. Transparent means a real alpha channel; all sprites must be fully inside the frame with a small margin. The three parallax strips must tile horizontally.
+
+| File | Size | Background | Prompt |
+|---|---|---|---|
+| `park-map-wide.webp` | 2400x1500 | opaque | Top-down wide island dinosaur park map: five clearly separated empty fenced enclosures at top-left, top-right, centre, bottom-left and bottom-right; connecting paths, visitor gate at bottom centre, lake and friendly volcano. No dinosaurs, people, text or signs. |
+| `park-map-tall.webp` | 1500x2400 | opaque | Portrait version of the island park for phones: five large empty fenced enclosures stacked in a zig-zag, connecting paths, gate at bottom, lake and friendly volcano. No dinosaurs, people, text or signs. |
+| `dino-raptor.webp` | 1024x1024 | transparent | Full-body slim raptor mid-run in side view facing right; green body with berry-purple accents, playful smile and friendly eye; no scary teeth. |
+| `dino-triceratops.webp` | 1024x1024 | transparent | Full-body chunky triceratops mid-run in side view facing right; green body with sunset-orange accents and three rounded ivory horns; playful face. |
+| `dino-trex.webp` | 1024x1024 | transparent | Full-body big goofy T-rex mid-run in side view facing right; leaf-green body, tiny arms and closed friendly smile; no scary teeth. |
+| `dino-stegosaurus.webp` | 1024x1024 | transparent | Full-body stegosaurus mid-run in side view facing right; green body with sky-blue plates and rounded spiky tail; playful face. |
+| `dino-pterodactyl.webp` | 1024x1024 | transparent | Full-body pterodactyl mid-flight in side view facing right, wings spread, sun-yellow accents, cheerful eye and closed beak. |
+| `runner-run.webp` | 768x768 | transparent | Gender-neutral kid explorer in side view facing right, mid-run stride; tan safari hat with green band, short brown hair, teal shirt, tan shorts, orange backpack and yellow sneakers. Match the other runner poses exactly. |
+| `runner-jump.webp` | 768x768 | transparent | The same kid explorer in side view facing right, jumping with knees tucked and arms raised for balance. Preserve hat, hair, clothes, backpack, shoes and face. |
+| `runner-duck.webp` | 768x768 | transparent | The same kid explorer in side view facing right, ducking or sliding low with bent knees and a hand near the ground. Preserve hat, hair, clothes, backpack, shoes and face. |
+| `obstacle-log.webp` | 768x384 | transparent | Single horizontal fallen jungle log to jump over, warm brown bark and a few fern leaves; no ground plane. |
+| `obstacle-branch.webp` | 768x384 | transparent | Low hanging leafy branch and vine attached at the top edge, leaving open space below to duck under; no ground plane. |
+| `obstacle-wall.webp` | 768x1024 | transparent | Chunky stone wall with a large completely blank light-sand wooden sign in the middle, occupying about 60% of the image width for app-rendered math questions. No letters or marks. |
+| `obstacle-fence.webp` | 768x768 | transparent | Single straight wooden enclosure fence panel, front view, warm amber posts and horizontal rails; no ground plane. |
+| `wall-rubble.webp` | 768x512 | transparent | Broken cartoon stone wall pieces flying outward with transparent gaps, playful and nonviolent; no ground plane. |
+| `gate-exit.webp` | 1024x1024 | transparent | Open tropical dinosaur park exit gate with warm golden sunlight shining through and an inviting escape feeling; no flames, signs or text. |
+| `ruby.webp` | 256x256 | transparent | Single shiny faceted red ruby gem with a strong simple silhouette readable at 24px. |
+| `bg-far.webp` | 2400x800 | opaque | Wide calm far parallax layer with sky, distant friendly volcano and layered jungle hills; left and right edges connect seamlessly. No people or dinosaurs. |
+| `bg-near.webp` | 2400x600 | transparent | Near parallax foliage: ferns and bushes along the bottom half; upper half entirely transparent; left and right edges connect seamlessly. |
+| `ground.webp` | 1200x200 | opaque | Side-view horizontal sandy dirt path strip with a grassy top edge and brown earth below; seamless horizontal tile. |

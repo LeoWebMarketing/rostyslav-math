@@ -16,6 +16,10 @@ function render(path: string) {
 }
 
 describe('home routing', () => {
+  it('matches the lazy game route', () => {
+    expect(render('/game?grade=3&subject=math&section=multiplication')).toContain('route-loading');
+  });
+
   it('renders the landing page at /', () => {
     expect(render('/')).toContain('Вчимося класно');
     expect(render('/')).toContain('href="/klasy"');

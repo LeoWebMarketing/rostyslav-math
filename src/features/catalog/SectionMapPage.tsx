@@ -6,7 +6,9 @@ import { useProgress } from '../progress/store';
 export function SectionMapPage() {
   const { grade, subject } = useParams();
   const sections = contentRegistry.filter(section => section.grade === Number(grade) && section.subject === subject);
-  const { guest, user, remote } = useProgress();
+  const { guest, user, remote, gameTickets, lastGameContext } = useProgress();
+  const gameSection = lastGameContext?.grade === Number(grade) && lastGameContext.subject === subject
+    ? lastGameContext.section : sections[0]?.section;
   const progress = (key: string) => user ? remote.find(row => row.lessonKey === key)?.bestStars ?? 0 : guest.lessons[key]?.bestStars ?? 0;
   let previous: string | null = null;
   let index = 0;
@@ -15,6 +17,13 @@ export function SectionMapPage() {
       <Mascot pose="hello" size={110} className="mascot" eager />
       <div className="speech-bubble">Крок за кроком — і все вийде!</div>
     </div>
+    {gameTickets > 0 && gameSection && (
+      <Link className="action-button" style={{ display: 'flex', maxWidth: 420, margin: '0 auto 24px', textAlign: 'center' }}
+        to={`/game?grade=${encodeURIComponent(grade ?? '')}&subject=${encodeURIComponent(subject ?? '')}&section=${encodeURIComponent(gameSection)}`}
+        aria-label={`Втекти від динозавра! Доступно забігів: ${gameTickets}`}>
+        Втекти від динозавра! 🦖
+      </Link>
+    )}
     {sections.length ? sections.map(section => (
       <section className="path-section" key={section.id}>
         <h1>{section.title}</h1>

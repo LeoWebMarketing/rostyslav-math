@@ -7,7 +7,7 @@ import { useProgress } from './store';
 import { Player } from '../lesson/Player';
 
 export function ReviewPage() {
-  const { guest, user, activeProfileId } = useProgress();
+  const { guest, user, activeProfileId, gameMistakes, gamePractised } = useProgress();
   const [mistakes, setMistakes] = useState(guest.mistakes);
   useEffect(() => {
     if (!user || !activeProfileId) return;
@@ -15,15 +15,19 @@ export function ReviewPage() {
       .then(data => setMistakes(data.mistakes.map(item => `${item.lessonKey}|${item.exerciseId}`)))
       .catch(() => setMistakes(guest.mistakes));
   }, [user, activeProfileId, guest.mistakes]);
-  const recent = [...new Set([...mistakes].reverse())].slice(0, 12);
-  const exercises = recent.flatMap(item => {
+  const recent = [...new Set([...mistakes, ...gameMistakes].reverse())]
+    .filter(item => !gamePractised.includes(item)).slice(0, 12);
+  const entries = recent.flatMap(item => {
     const [key, exerciseId] = item.split('|');
     const [grade, subject, section, lesson] = key.split('/');
     const data = contentRegistry
       .find(row => row.grade === Number(grade) && row.subject === subject && row.section === section)
       ?.lessons.find(row => row.id === lesson);
-    return data?.exercises.filter(exercise => exercise.id === exerciseId) ?? [];
+    return data?.exercises.filter(exercise => exercise.id === exerciseId)
+      .map(exercise => ({ exercise, key: item })) ?? [];
   });
+  const exercises = entries.map(item => item.exercise);
+  const reviewKeys = Object.fromEntries(entries.map(item => [item.exercise.id, item.key]));
   if (!exercises.length) return (
     <Shell title="Робота над помилками">
       <div className="empty-state">
@@ -41,6 +45,7 @@ export function ReviewPage() {
       lessonKey="review/recent/all/review"
       back="/klasy"
       review
+      reviewKeys={reviewKeys}
     />
   );
 }

@@ -58,7 +58,7 @@ export function Mascot({
 
 export function Shell({ children, title, back = '/', contentClassName = '' }: { children: ReactNode; title?: string; back?: string; contentClassName?: string }) {
   const { pathname } = useLocation();
-  const { user, activeProfileId, profiles, guest, streak, todayXp, authAvailable } = useProgress();
+  const { user, activeProfileId, profiles, guest, streak, todayXp, authAvailable, gameRubies } = useProgress();
   const stats = user ? { streak, todayXp } : guestStats(guest);
   const active = profiles.find(profile => profile.id === activeProfileId);
   return <div className="jungle-page">
@@ -80,6 +80,9 @@ export function Shell({ children, title, back = '/', contentClassName = '' }: { 
       <div className="header-stats">
         <span aria-label={`Серія ${stats.streak} днів`}>🔥 {stats.streak}</span>
         <span aria-label={`${stats.todayXp} досвіду сьогодні`}>⭐ {stats.todayXp}</span>
+        <span aria-label={`${gameRubies} рубінів`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Art file="/theme/dino/game/ruby.webp" fallback="💎" alt="" width={24} height={24} eager /> {gameRubies}
+        </span>
       </div>
       {user ? (
         <Link className="profile-link" to="/profiles" aria-label="Профілі">

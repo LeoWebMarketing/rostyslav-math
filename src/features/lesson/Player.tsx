@@ -39,9 +39,12 @@ export function FeedbackSheet({ exercise, correct, onContinue, voice }: {
   );
 }
 
-export function Player({ lesson, lessonKey, back, review = false }: { lesson: Lesson; lessonKey: string; back: string; review?: boolean }) {
+export function Player({ lesson, lessonKey, back, review = false, reviewKeys = {} }: {
+  lesson: Lesson; lessonKey: string; back: string; review?: boolean; reviewKeys?: Record<string, string>;
+}) {
   const navigate = useNavigate();
   const recordLesson = useProgress(state => state.recordLesson);
+  const markGamePractised = useProgress(state => state.markGamePractised);
   const [state, setState] = useState(() => startLesson(lesson));
   const [answer, setAnswer] = useState<Answer>('');
   const [completed, setCompleted] = useState(false);
@@ -67,9 +70,16 @@ export function Player({ lesson, lessonKey, back, review = false }: { lesson: Le
     recorded.current = true;
     setCompleted(true);
     const result = lessonResult(state);
-    void recordLesson(lessonKey, result.stars, result.accuracy, result.xp, state.attempts);
+    if (review) {
+      for (const exerciseId of state.solved) {
+        const key = reviewKeys[exerciseId];
+        if (key) markGamePractised(key);
+      }
+    } else {
+      void recordLesson(lessonKey, result.stars, result.accuracy, result.xp, state.attempts);
+    }
     navigate('/lesson-end', { replace: true, state: { ...result, lessonKey, review } });
-  }, [state, completed, lessonKey, navigate, recordLesson, review]);
+  }, [state, completed, lessonKey, navigate, recordLesson, review, reviewKeys, markGamePractised]);
   if (!exercise) return <div className="lesson-page">Завершуємо урок…</div>;
   const onClose = () => { if (window.confirm('Вийти з уроку? Незавершений урок не збережеться.')) navigate(back); };
   const onContinue = () => { setState(current => continueLesson(current)); setAnswer(''); };

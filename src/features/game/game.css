@@ -1,0 +1,188 @@
+.game-content {
+  max-width: none;
+  padding: 12px max(12px, env(safe-area-inset-right)) 24px max(12px, env(safe-area-inset-left));
+}
+
+.game-map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 350px);
+  gap: 16px;
+  min-height: calc(100dvh - 104px);
+}
+
+.park-map {
+  position: relative;
+  min-height: 510px;
+  overflow: hidden;
+  border: 4px solid var(--sand-300);
+  border-radius: 26px;
+  background: radial-gradient(circle at 50% 30%, #7ccb80, #226448);
+}
+
+.park-map picture,
+.park-map picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.park-map picture { position: absolute; inset: 0; }
+.park-map picture img { object-fit: cover; }
+
+.park-hotspot {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 96px;
+  min-height: 104px;
+  padding: 4px;
+  border: 3px solid var(--sand-100);
+  border-radius: 22px;
+  background: rgba(18, 53, 42, .86);
+  color: white;
+  font: 800 16px Nunito, sans-serif;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 5px 0 #0a3022;
+}
+
+.park-hotspot img { max-width: 68px; max-height: 68px; object-fit: contain; }
+.park-hotspot span { white-space: nowrap; }
+.park-hotspot.inspected { border-color: var(--sun-400); }
+.park-hotspot.chosen { animation: enclosure-pulse 1s ease-in-out infinite; }
+.park-hotspot.top-left { top: 25%; left: 19%; }
+.park-hotspot.top-right { top: 24%; left: 80%; }
+.park-hotspot.centre { top: 48%; left: 50%; }
+.park-hotspot.bottom-left { top: 74%; left: 19%; }
+.park-hotspot.bottom-right { top: 74%; left: 80%; }
+
+@keyframes enclosure-pulse {
+  50% { box-shadow: 0 0 0 8px rgba(255, 194, 61, .44), 0 5px 0 #0a3022; }
+}
+
+.game-map-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 20px;
+  border-radius: 26px;
+  background: var(--sand-100);
+  color: var(--ink-900);
+  text-align: center;
+}
+
+.game-map-panel h1 { margin: 0; font-size: clamp(26px, 2.7vw, 34px); line-height: 1.15; }
+.game-map-panel p { margin: 3px 0; font-size: 17px; line-height: 1.35; }
+.game-map-panel .game-tickets { font-weight: 800; }
+.game-map-panel .action-button { min-height: 64px; }
+.game-map-panel .game-no-ticket { font-weight: 800; color: var(--jungle-700); }
+
+.game-wheel-wrap {
+  position: relative;
+  width: min(245px, 100%);
+  aspect-ratio: 1;
+  margin: 2px auto 0;
+}
+
+.game-wheel { width: 100%; height: 100%; transition: transform 3.6s cubic-bezier(.14, .72, .11, 1); filter: drop-shadow(0 6px 2px #0d3326); }
+.game-wheel-pointer { position: absolute; top: -22px; left: 50%; z-index: 1; transform: translateX(-50%); color: var(--lava-500); font-size: 30px; }
+.game-spin-result { min-height: 48px; font-weight: 800; }
+
+.game-run-page {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+}
+
+.game-run-header {
+  min-height: 72px;
+  padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--jungle-900);
+}
+
+.game-header-button {
+  min-width: 104px;
+  min-height: 64px;
+  padding: 4px 10px;
+  border: 2px solid var(--sand-300);
+  border-radius: 15px;
+  background: var(--sand-100);
+  color: var(--ink-900);
+  font: 800 17px Nunito, sans-serif;
+}
+
+.game-distance { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 370px; font-size: 27px; }
+.game-distance-track { display: block; flex: 1; height: 17px; border: 2px solid var(--sand-100); border-radius: 12px; background: var(--lava-500); overflow: hidden; }
+.game-distance-track > span { display: block; height: 100%; border-radius: 12px; background: var(--leaf-500); transition: width .2s; }
+.game-run-rubies { min-width: 68px; display: flex; align-items: center; justify-content: end; gap: 5px; font-size: 20px; font-weight: 800; }
+.game-run-rubies img { object-fit: contain; }
+.game-turn-hint { display: none; margin: 0; padding: 4px 8px; text-align: center; background: var(--jungle-700); font-size: 16px; }
+
+.game-stage { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.runner-canvas { display: block; flex: 1 1 0; min-height: 0; width: 100%; height: 0; touch-action: none; }
+.game-controls { position: relative; flex: none; min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px max(16px, env(safe-area-inset-right)) 11px max(16px, env(safe-area-inset-left)); background: var(--jungle-900); }
+.game-controls button { min-width: min(42vw, 230px); min-height: 78px; padding: 8px; border: 3px solid var(--sand-100); border-radius: 20px; background: var(--leaf-500); color: var(--ink-900); box-shadow: 0 5px 0 #168348; font: 800 clamp(18px, 3vw, 24px) Nunito, sans-serif; pointer-events: auto; }
+.game-controls button:last-child { background: var(--sun-400); box-shadow: 0 5px 0 #c48c21; }
+.game-controls button:active, .game-header-button:active { transform: translateY(3px); box-shadow: none; }
+
+.game-overlay { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: safe center; padding: 12px; background: rgba(18, 53, 42, .78); overflow-y: auto; }
+.game-question-card, .game-result-card { width: min(100%, 600px); max-height: 100%; padding: clamp(16px, 3vw, 28px); border: 5px solid var(--sun-400); border-radius: 24px; background: var(--sand-100); color: var(--ink-900); text-align: center; overflow-y: auto; }
+.game-question-card h2, .game-result-card h2 { margin: 6px 0 18px; font-size: clamp(23px, 4vw, 31px); line-height: 1.25; }
+.game-question-progress { margin: 0; color: var(--jungle-700); font-weight: 800; }
+.game-answer-list { display: grid; gap: 12px; }
+.game-answer-list button, .game-speak { width: 100%; min-height: 64px; padding: 10px 14px; border: 3px solid var(--sand-300); border-radius: 17px; background: white; color: var(--ink-900); font: 800 21px Nunito, sans-serif; }
+.game-answer-list button:active { background: var(--sky-400); }
+.game-feedback { display: grid; gap: 10px; font-size: 20px; }
+.game-feedback p { margin: 0; }
+.game-right, .game-correct-answer { color: #126338; font-weight: 800; }
+.game-wrong { color: #9c361d; font-weight: 800; }
+.game-result-card { display: grid; justify-items: center; gap: 14px; }
+.game-result-card p { margin: 0; font-size: 19px; }
+.game-result-card img { object-fit: contain; }
+.game-result-card .action-button { min-height: 64px; }
+.game-loading { display: grid; place-content: center; justify-items: center; gap: 10px; font-size: 22px; font-weight: 800; }
+
+@media (max-width: 767px) {
+  .game-map-layout { display: flex; flex-direction: column; min-height: 0; gap: 0; }
+  .park-map { min-height: 440px; border-radius: 24px 24px 0 0; }
+  .park-hotspot { min-width: 84px; min-height: 72px; font-size: 16px; }
+  .park-hotspot img { width: 51px; height: 51px; }
+  .park-hotspot.top-left { top: 12%; left: 27%; }
+  .park-hotspot.top-right { top: 29%; left: 72%; }
+  .park-hotspot.centre { top: 46%; left: 33%; }
+  .park-hotspot.bottom-left { top: 64%; left: 70%; }
+  .park-hotspot.bottom-right { top: 83%; left: 29%; }
+  .game-map-panel { position: relative; margin-top: -10px; border-radius: 24px; box-shadow: 0 -6px 18px rgba(18, 53, 42, .35); }
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .game-turn-hint { display: block; }
+  .game-run-header { gap: 5px; }
+  .game-header-button { min-width: 72px; font-size: 25px; }
+  .game-pause-label { display: none; }
+  .game-distance { gap: 2px; font-size: 23px; }
+  .game-run-rubies { min-width: 54px; font-size: 18px; }
+}
+
+@media (orientation: landscape) and (max-height: 430px) {
+  .game-run-header { min-height: 64px; padding-top: 4px; padding-bottom: 4px; }
+  .game-header-button { min-height: 54px; }
+  .game-controls { min-height: 72px; padding-top: 4px; padding-bottom: 8px; }
+  .game-controls button { min-height: 58px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .park-hotspot.chosen { animation: none; outline: 5px solid var(--sun-400); }
+  .game-wheel, .game-distance-track > span { transition: none; }
+}
